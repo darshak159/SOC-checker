@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SOC Checker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body, #root { height: 100%; }
+
+    body {
+      font-family: 'DM Sans', -apple-system, system-ui, sans-serif;
+      background: #E2E0DC;
+      color: #1C1917;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    @media (min-width: 481px) {
+      body { display: flex; align-items: stretch; justify-content: center; min-height: 100vh; }
+      #root { width: 100%; display: flex; justify-content: center; }
+    }
+
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-thumb { background: #D6D3D1; border-radius: 9px; }
+
+    button, input, select, textarea { font-family: inherit; }
+    button { cursor: pointer; border: none; background: none; padding: 0; }
+
+    /* ── Shell ── */
+    .app-shell {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100%;
+      background: #F7F6F3;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── Screen ── */
+    .screen {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px 120px;
+    }
+
+    /* ── Top bar ── */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 16px;
+      background: #fff;
+      border-bottom: 1px solid #EEEDEB;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    /* ── Bottom nav ── */
+    .bottom-nav {
+      display: flex;
+      align-items: stretch;
+      border-top: 1px solid #EEEDEB;
+      background: #fff;
+      flex-shrink: 0;
+      padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 4px 8px;
+      gap: 3px;
+      color: #B5B0AB;
+      transition: color 0.12s;
+      position: relative;
+    }
+    .nav-item.active { color: #1C1917; }
+    .nav-item span { font-size: 10px; font-weight: 500; }
+
+    /* ── Cards ── */
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid #EEEDEB;
+      padding: 16px;
+    }
+
+    /* ── Labels ── */
+    .label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #A8A29E;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+      display: block;
+    }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      display: block;
+      width: 100%;
+      padding: 14px 24px;
+      border-radius: 13px;
+      background: #1C1917;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      text-align: center;
+      transition: opacity 0.12s, background 0.12s;
+      cursor: pointer;
+    }
+    .btn-primary:hover { background: #2C2926; }
+    .btn-primary:active { background: #0C0A09; }
+    .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .btn-secondary {
+      display: block;
+      width: 100%;
+      padding: 12px 24px;
+      border-radius: 12px;
+      background: #F5F4F1;
+      color: #1C1917;
+      font-size: 14px;
+      font-weight: 500;
+      text-align: center;
+      border: 1px solid #EEEDEB;
+      transition: background 0.12s;
+    }
+    .btn-secondary:hover { background: #EDECE9; }
+
+    /* ── Inputs ── */
+    .soc-input {
+      display: block;
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #E7E5E4;
+      border-radius: 11px;
+      font-size: 15px;
+      color: #1C1917;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .soc-input:focus { border-color: #1C1917; }
+    .soc-input::placeholder { color: #B5B0AB; }
+    .soc-select { appearance: none; cursor: pointer; }
+
+    /* ── Login row ── */
+    .login-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      border-radius: 12px;
+      background: #fff;
+      border: 1.5px solid #EEEDEB;
+      text-align: left;
+      width: 100%;
+      transition: border-color 0.12s;
+    }
+    .login-row:hover { border-color: #A8A29E; }
+    .login-row:active { background: #F9F8F6; }
+
+    /* ── Picker buttons ── */
+    .picker-btn {
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      border: 1.5px solid #EEEDEB;
+      background: #fff;
+      color: #1C1917;
+      transition: all 0.12s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .picker-btn.active {
+      background: #1C1917;
+      border-color: #1C1917;
+      color: #fff;
+    }
+    .picker-btn:hover:not(.active) { border-color: #A8A29E; }
+
+    /* ── Template button ── */
+    .tpl-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1.5px solid #EEEDEB;
+      background: #fff;
+      color: #1C1917;
+      margin-bottom: 8px;
+      transition: all 0.12s;
+    }
+    .tpl-btn.active {
+      background: #1C1917;
+      border-color: #1C1917;
+      color: #fff;
+    }
+    .tpl-btn:hover:not(.active) { border-color: #A8A29E; }
+
+    /* ── Rating icon buttons (pass/fail only) ── */
+    .rating-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 99px;
+      border: 1.5px solid #E7E5E4;
+      background: #F9F8F6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.1s;
+      flex-shrink: 0;
+    }
+    .rating-btn:hover { border-color: #A8A29E; }
+
+    /* ── Score pill ── */
+    .score-pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 99px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* ── Notification badge ── */
+    .notif-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: #DC2626;
+      color: #fff;
+      border-radius: 99px;
+      font-size: 9px;
+      font-weight: 700;
+      min-width: 15px;
+      height: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 3px;
+      line-height: 1;
+    }
+
+    /* ── Tab strip ── */
+    .tab-strip {
+      display: flex;
+      gap: 2px;
+      background: #EEEDEB;
+      padding: 3px;
+      border-radius: 10px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 7px 6px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #78716C;
+      transition: all 0.15s;
+      text-align: center;
+    }
+    .tab-btn.active {
+      background: #fff;
+      color: #1C1917;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    }
+
+    /* ── Report table ── */
+    .report-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .report-table th {
+      text-align: left;
+      padding: 9px 14px;
+      color: #A8A29E;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid #EEEDEB;
+      white-space: nowrap;
+    }
+    .report-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #F5F4F1;
+      vertical-align: middle;
+    }
+    .report-table tr:last-child td { border-bottom: none; }
+    .report-table tbody tr:hover td { background: #FAFAF9; }
+
+    /* ── Responsive ── */
+    .main-area {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .content-wrap {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (min-width: 768px) {
+      body { background: #DDDBD7; }
+
+      #root { align-items: flex-start; padding: 24px; }
+
+      .app-shell {
+        max-width: 1060px;
+        width: 100%;
+        border-radius: 20px;
+        box-shadow: 0 8px 48px rgba(0,0,0,0.13);
+        overflow: hidden;
+        min-height: calc(100vh - 48px);
+        height: calc(100vh - 48px);
+      }
+
+      /* Sidebar nav */
+      .main-area { flex-direction: row; }
+
+      .bottom-nav {
+        flex-direction: column;
+        width: 200px;
+        min-width: 200px;
+        border-top: none;
+        border-right: 1px solid #EEEDEB;
+        padding: 16px 10px;
+        height: 100%;
+        align-items: stretch;
+        gap: 2px;
+      }
+
+      .nav-item {
+        flex-direction: row;
+        justify-content: flex-start;
+        padding: 11px 14px;
+        gap: 12px;
+        border-radius: 11px;
+        width: 100%;
+      }
+      .nav-item span {
+        font-size: 14px;
+        font-weight: 500;
+      }
+      .nav-item.active { background: #F5F4F1; }
+      .nav-item .notif-badge { top: -3px; right: -3px; }
+
+      /* Wider screen content */
+      .screen { padding: 24px 32px 80px; }
+
+      /* Login screen — wider form area */
+      .app-shell > div { flex-direction: row; }
+    }
+
+    @media (min-width: 1024px) {
+      .app-shell { max-width: 1200px; }
+      .bottom-nav { width: 220px; min-width: 220px; }
+      .screen { padding: 28px 40px 80px; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeIn 0.22s ease; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="soc-data.js"></script>
+  <script type="text/babel" src="soc-app.jsx"></script>
+</body>
+</html>
