@@ -192,8 +192,26 @@
       async function addUser(u) { return adminAction({ action: 'create', display_name: u.name, role: u.role, pin: u.pin, outlet: 'Brock' }); }
       async function removeUser(id) { return adminAction({ action: 'delete', id }); }
 
+      // ── Live updates: subscribe to changes on the tables this user can see.
+      //    Realtime honours RLS, so the events received are already access-scoped.
+      function subscribe(onChange, onStatus) {
+        if (!client || typeof client.channel !== 'function') return null;
+        try {
+          client.auth.getSession().then(({ data }) => {
+            const tok = data && data.session && data.session.access_token;
+            if (tok && client.realtime && client.realtime.setAuth) client.realtime.setAuth(tok);
+          });
+        } catch (e) {}
+        const ch = client.channel('soc-live');
+        ['checks', 'templates', 'profiles'].forEach(t =>
+          ch.on('postgres_changes', { event: '*', schema: 'public', table: t }, () => { if (onChange) onChange(); }));
+        ch.subscribe(status => { if (onStatus) onStatus(status); });
+        return ch;
+      }
+      function unsubscribe(ch) { try { if (ch && client) client.removeChannel(ch); } catch (e) {} }
+
       return { configured, saveConfig, getConfig: () => CONFIG, init, loginDirectory, signIn, signOut,
-        currentUser, loadData, insertCheck, addTemplates, deleteTemplate, addUser, removeUser };
+        currentUser, loadData, insertCheck, addTemplates, deleteTemplate, addUser, removeUser, subscribe, unsubscribe };
     })();
   </script>
 
@@ -368,7 +386,7 @@ function LoginScreen({ onAuthed }) {
   );
 }
 
-function TopBar({ user, onLogout }) {
+function TopBar({ user, live, onLogout }) {
   return (
     <div className="top-bar">
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -383,7 +401,13 @@ function TopBar({ user, onLogout }) {
           </div>
         </div>
       </div>
-      <button onClick={onLogout} style={{ padding: 8, borderRadius: 8, color: '#78716C' }}><Icon name="logout" size={20} /></button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }} title={live ? 'Live — updates in real time' : 'Reconnecting…'}>
+          <span style={{ width: 7, height: 7, borderRadius: 99, background: live ? '#22C55E' : '#D6D3D1', boxShadow: live ? '0 0 0 3px rgba(34,197,94,0.18)' : 'none', transition: 'all 0.2s' }} />
+          <span style={{ fontSize: 11, fontWeight: 600, color: live ? '#16A34A' : '#A8A29E' }}>{live ? 'Live' : '—'}</span>
+        </span>
+        <button onClick={onLogout} style={{ padding: 8, borderRadius: 8, color: '#78716C' }}><Icon name="logout" size={20} /></button>
+      </div>
     </div>
   );
 }
@@ -912,8 +936,20 @@ function App() {
   const [viewCheck, setViewCheck] = useState(null);
   const [submitted, setSubmitted] = useState(null);
   const [toast, setToast] = useState('');
+  const [live, setLive] = useState(false);
 
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(''), 4000); return () => clearTimeout(t); } }, [toast]);
+
+  // Live updates — refresh every device when any visible check/template/team changes.
+  useEffect(() => {
+    if (phase !== 'app') return;
+    let timer = null;
+    const ch = SocDB.subscribe(
+      () => { clearTimeout(timer); timer = setTimeout(() => { reload(); }, 400); },
+      status => setLive(status === 'SUBSCRIBED')
+    );
+    return () => { clearTimeout(timer); SocDB.unsubscribe(ch); setLive(false); };
+  }, [phase]);
 
   useEffect(() => { (async () => {
     if (!SocDB.configured()) { setPhase('setup'); return; }
@@ -954,7 +990,7 @@ function App() {
       {viewCheck && <CheckDetailModal check={viewCheck} data={data} onClose={() => setViewCheck(null)} />}
       {toast && <div className="toast">{toast}</div>}
 
-      <TopBar user={user} onLogout={logout} />
+      <TopBar user={user} live={live} onLogout={logout} />
 
       {tab === 'new'
         ? <NewCheckScreen data={data} user={user} onSave={saveCheck} onBack={() => setTab('dashboard')} />

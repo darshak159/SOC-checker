@@ -95,6 +95,30 @@ On phones: **Share → Add to Home Screen** to pin it like an app.
 
 ---
 
+## Live updates (real-time)
+
+Every device updates **automatically** — when anyone submits a check, it appears on
+all other signed-in devices within about a second, no refresh needed. A green
+**● Live** badge in the top bar shows the connection is active.
+
+This honours the same security rules: a trainer's device only receives live updates
+for **their own** checks, while managers/GM see the whole team's activity stream live.
+
+Realtime is turned on by the migration in Part 2. **If you already ran the migration
+before this was added**, just run this once in the SQL Editor:
+
+```sql
+do $$ begin
+  if exists (select 1 from pg_publication where pubname='supabase_realtime') then
+    begin alter publication supabase_realtime add table public.checks;    exception when duplicate_object then null; end;
+    begin alter publication supabase_realtime add table public.templates; exception when duplicate_object then null; end;
+    begin alter publication supabase_realtime add table public.profiles;  exception when duplicate_object then null; end;
+  end if;
+end $$;
+```
+
+---
+
 ## Security model (what's protected, and how)
 
 Access is enforced by the database (**Row-Level Security**), not just hidden in the UI —
