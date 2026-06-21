@@ -7,1075 +7,367 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body, #root { height: 100%; }
-
-    body {
-      font-family: 'DM Sans', -apple-system, system-ui, sans-serif;
-      background: #E2E0DC;
-      color: #1C1917;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    @media (min-width: 481px) {
-      body { display: flex; align-items: stretch; justify-content: center; min-height: 100vh; }
-      #root { width: 100%; display: flex; justify-content: center; }
-    }
-
-    ::-webkit-scrollbar { width: 3px; }
-    ::-webkit-scrollbar-thumb { background: #D6D3D1; border-radius: 9px; }
-
-    button, input, select, textarea { font-family: inherit; }
-    button { cursor: pointer; border: none; background: none; padding: 0; }
-
-    /* ── Shell ── */
-    .app-shell {
-      width: 100%;
-      max-width: 480px;
-      min-height: 100%;
-      background: #F7F6F3;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* ── Screen ── */
-    .screen {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px 16px 120px;
-    }
-
-    /* ── Top bar ── */
-    .top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 13px 16px;
-      background: #fff;
-      border-bottom: 1px solid #EEEDEB;
-      flex-shrink: 0;
-      z-index: 10;
-    }
-
-    /* ── Bottom nav ── */
-    .bottom-nav {
-      display: flex;
-      align-items: stretch;
-      border-top: 1px solid #EEEDEB;
-      background: #fff;
-      flex-shrink: 0;
-      padding-bottom: env(safe-area-inset-bottom, 0);
-    }
-    .nav-item {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 10px 4px 8px;
-      gap: 3px;
-      color: #B5B0AB;
-      transition: color 0.12s;
-      position: relative;
-    }
-    .nav-item.active { color: #1C1917; }
-    .nav-item span { font-size: 10px; font-weight: 500; }
-
-    /* ── Cards ── */
-    .card {
-      background: #fff;
-      border-radius: 14px;
-      border: 1px solid #EEEDEB;
-      padding: 16px;
-    }
-
-    /* ── Labels ── */
-    .label {
-      font-size: 11px;
-      font-weight: 600;
-      color: #A8A29E;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      margin-bottom: 7px;
-      display: block;
-    }
-
-    /* ── Buttons ── */
-    .btn-primary {
-      display: block;
-      width: 100%;
-      padding: 14px 24px;
-      border-radius: 13px;
-      background: #1C1917;
-      color: #fff;
-      font-size: 15px;
-      font-weight: 600;
-      text-align: center;
-      transition: opacity 0.12s, background 0.12s;
-      cursor: pointer;
-    }
-    .btn-primary:hover { background: #2C2926; }
-    .btn-primary:active { background: #0C0A09; }
-    .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
-
-    .btn-secondary {
-      display: block;
-      width: 100%;
-      padding: 12px 24px;
-      border-radius: 12px;
-      background: #F5F4F1;
-      color: #1C1917;
-      font-size: 14px;
-      font-weight: 500;
-      text-align: center;
-      border: 1px solid #EEEDEB;
-      transition: background 0.12s;
-    }
+    body { font-family: 'DM Sans', -apple-system, system-ui, sans-serif; background: #E2E0DC; color: #1C1917; -webkit-font-smoothing: antialiased; }
+    @media (min-width: 481px) { body { display: flex; align-items: stretch; justify-content: center; min-height: 100vh; } #root { width: 100%; display: flex; justify-content: center; } }
+    ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-thumb { background: #D6D3D1; border-radius: 9px; }
+    button, input, select, textarea { font-family: inherit; } button { cursor: pointer; border: none; background: none; padding: 0; }
+    .app-shell { width: 100%; max-width: 480px; min-height: 100%; background: #F7F6F3; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+    .screen { flex: 1; overflow-y: auto; padding: 16px 16px 120px; }
+    .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; background: #fff; border-bottom: 1px solid #EEEDEB; flex-shrink: 0; z-index: 10; }
+    .bottom-nav { display: flex; align-items: stretch; border-top: 1px solid #EEEDEB; background: #fff; flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom, 0); }
+    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 4px 8px; gap: 3px; color: #B5B0AB; transition: color 0.12s; position: relative; }
+    .nav-item.active { color: #1C1917; } .nav-item span { font-size: 10px; font-weight: 500; }
+    .card { background: #fff; border-radius: 14px; border: 1px solid #EEEDEB; padding: 16px; }
+    .label { font-size: 11px; font-weight: 600; color: #A8A29E; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 7px; display: block; }
+    .btn-primary { display: block; width: 100%; padding: 14px 24px; border-radius: 13px; background: #1C1917; color: #fff; font-size: 15px; font-weight: 600; text-align: center; transition: opacity 0.12s, background 0.12s; cursor: pointer; }
+    .btn-primary:hover { background: #2C2926; } .btn-primary:active { background: #0C0A09; } .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-secondary { display: block; width: 100%; padding: 12px 24px; border-radius: 12px; background: #F5F4F1; color: #1C1917; font-size: 14px; font-weight: 500; text-align: center; border: 1px solid #EEEDEB; transition: background 0.12s; }
     .btn-secondary:hover { background: #EDECE9; }
-
-    /* ── Inputs ── */
-    .soc-input {
-      display: block;
-      width: 100%;
-      padding: 12px 14px;
-      border: 1.5px solid #E7E5E4;
-      border-radius: 11px;
-      font-size: 15px;
-      color: #1C1917;
-      background: #fff;
-      outline: none;
-      transition: border-color 0.15s;
-    }
-    .soc-input:focus { border-color: #1C1917; }
-    .soc-input::placeholder { color: #B5B0AB; }
+    .soc-input { display: block; width: 100%; padding: 12px 14px; border: 1.5px solid #E7E5E4; border-radius: 11px; font-size: 15px; color: #1C1917; background: #fff; outline: none; transition: border-color 0.15s; }
+    .soc-input:focus { border-color: #1C1917; } .soc-input::placeholder { color: #B5B0AB; }
     .soc-select { appearance: none; cursor: pointer; }
-
-    /* ── Login row ── */
-    .login-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 11px 14px;
-      border-radius: 12px;
-      background: #fff;
-      border: 1.5px solid #EEEDEB;
-      text-align: left;
-      width: 100%;
-      transition: border-color 0.12s;
-    }
-    .login-row:hover { border-color: #A8A29E; }
-    .login-row:active { background: #F9F8F6; }
-
-    /* ── Picker buttons ── */
-    .picker-btn {
-      padding: 12px 16px;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 500;
-      border: 1.5px solid #EEEDEB;
-      background: #fff;
-      color: #1C1917;
-      transition: all 0.12s;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .picker-btn.active {
-      background: #1C1917;
-      border-color: #1C1917;
-      color: #fff;
-    }
-    .picker-btn:hover:not(.active) { border-color: #A8A29E; }
-
-    /* ── Template button ── */
-    .tpl-btn {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      width: 100%;
-      padding: 14px 16px;
-      border-radius: 12px;
-      border: 1.5px solid #EEEDEB;
-      background: #fff;
-      color: #1C1917;
-      margin-bottom: 8px;
-      transition: all 0.12s;
-    }
-    .tpl-btn.active {
-      background: #1C1917;
-      border-color: #1C1917;
-      color: #fff;
-    }
-    .tpl-btn:hover:not(.active) { border-color: #A8A29E; }
-
-    /* ── Rating icon buttons (pass/fail only) ── */
-    .rating-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 99px;
-      border: 1.5px solid #E7E5E4;
-      background: #F9F8F6;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.1s;
-      flex-shrink: 0;
-    }
-    .rating-btn:hover { border-color: #A8A29E; }
-
-    /* ── Score pill ── */
-    .score-pill {
-      display: inline-flex;
-      align-items: center;
-      border-radius: 99px;
-      padding: 3px 10px;
-      font-size: 12px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    /* ── Notification badge ── */
-    .notif-badge {
-      position: absolute;
-      top: -4px;
-      right: -4px;
-      background: #DC2626;
-      color: #fff;
-      border-radius: 99px;
-      font-size: 9px;
-      font-weight: 700;
-      min-width: 15px;
-      height: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 3px;
-      line-height: 1;
-    }
-
-    /* ── Tab strip ── */
-    .tab-strip {
-      display: flex;
-      gap: 2px;
-      background: #EEEDEB;
-      padding: 3px;
-      border-radius: 10px;
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 7px 6px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 500;
-      color: #78716C;
-      transition: all 0.15s;
-      text-align: center;
-    }
-    .tab-btn.active {
-      background: #fff;
-      color: #1C1917;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
-    }
-
-    /* ── Report table ── */
+    .login-row { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 12px; background: #fff; border: 1.5px solid #EEEDEB; text-align: left; width: 100%; transition: border-color 0.12s; }
+    .login-row:hover { border-color: #A8A29E; } .login-row:active { background: #F9F8F6; }
+    .picker-btn { padding: 12px 16px; border-radius: 12px; font-size: 14px; font-weight: 500; border: 1.5px solid #EEEDEB; background: #fff; color: #1C1917; transition: all 0.12s; display: flex; justify-content: space-between; align-items: center; }
+    .picker-btn.active { background: #1C1917; border-color: #1C1917; color: #fff; } .picker-btn:hover:not(.active) { border-color: #A8A29E; }
+    .tpl-btn { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px; border-radius: 12px; border: 1.5px solid #EEEDEB; background: #fff; color: #1C1917; margin-bottom: 8px; transition: all 0.12s; }
+    .tpl-btn.active { background: #1C1917; border-color: #1C1917; color: #fff; } .tpl-btn:hover:not(.active) { border-color: #A8A29E; }
+    .score-pill { display: inline-flex; align-items: center; border-radius: 99px; padding: 3px 10px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+    .notif-badge { position: absolute; top: -4px; right: -4px; background: #DC2626; color: #fff; border-radius: 99px; font-size: 9px; font-weight: 700; min-width: 15px; height: 15px; display: flex; align-items: center; justify-content: center; padding: 0 3px; line-height: 1; }
+    .tab-strip { display: flex; gap: 2px; background: #EEEDEB; padding: 3px; border-radius: 10px; }
+    .tab-btn { flex: 1; padding: 7px 6px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #78716C; transition: all 0.15s; text-align: center; }
+    .tab-btn.active { background: #fff; color: #1C1917; box-shadow: 0 1px 3px rgba(0,0,0,0.07); }
     .report-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .report-table th {
-      text-align: left;
-      padding: 9px 14px;
-      color: #A8A29E;
-      font-weight: 600;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border-bottom: 1px solid #EEEDEB;
-      white-space: nowrap;
-    }
-    .report-table td {
-      padding: 10px 14px;
-      border-bottom: 1px solid #F5F4F1;
-      vertical-align: middle;
-    }
-    .report-table tr:last-child td { border-bottom: none; }
-    .report-table tbody tr:hover td { background: #FAFAF9; }
-
-    /* ── Responsive ── */
-    .main-area {
-      flex: 1;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-    .content-wrap {
-      flex: 1;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-
+    .report-table th { text-align: left; padding: 9px 14px; color: #A8A29E; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #EEEDEB; white-space: nowrap; }
+    .report-table td { padding: 10px 14px; border-bottom: 1px solid #F5F4F1; vertical-align: middle; }
+    .report-table tr:last-child td { border-bottom: none; } .report-table tbody tr:hover td { background: #FAFAF9; }
+    .main-area { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+    .content-wrap { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+    .pin-dot { width: 14px; height: 14px; border-radius: 99px; border: 2px solid #C8C4C0; transition: all 0.12s; }
+    .pin-dot.filled { background: #1C1917; border-color: #1C1917; }
+    .key-btn { height: 60px; border-radius: 14px; background: #fff; border: 1.5px solid #EEEDEB; font-size: 24px; font-weight: 600; color: #1C1917; display: flex; align-items: center; justify-content: center; transition: background 0.1s; }
+    .key-btn:active { background: #EDECE9; }
+    .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: #1C1917; color: #fff; padding: 12px 18px; border-radius: 12px; font-size: 13px; font-weight: 500; z-index: 400; max-width: 90%; box-shadow: 0 6px 24px rgba(0,0,0,0.2); }
     @media (min-width: 768px) {
-      body { background: #DDDBD7; }
-
-      #root { align-items: flex-start; padding: 24px; }
-
-      .app-shell {
-        max-width: 1060px;
-        width: 100%;
-        border-radius: 20px;
-        box-shadow: 0 8px 48px rgba(0,0,0,0.13);
-        overflow: hidden;
-        min-height: calc(100vh - 48px);
-        height: calc(100vh - 48px);
-      }
-
-      /* Sidebar nav */
+      body { background: #DDDBD7; } #root { align-items: flex-start; padding: 24px; }
+      .app-shell { max-width: 1060px; width: 100%; border-radius: 20px; box-shadow: 0 8px 48px rgba(0,0,0,0.13); overflow: hidden; min-height: calc(100vh - 48px); height: calc(100vh - 48px); }
       .main-area { flex-direction: row; }
-
-      .bottom-nav {
-        flex-direction: column;
-        width: 200px;
-        min-width: 200px;
-        border-top: none;
-        border-right: 1px solid #EEEDEB;
-        padding: 16px 10px;
-        height: 100%;
-        align-items: stretch;
-        gap: 2px;
-      }
-
-      .nav-item {
-        flex-direction: row;
-        justify-content: flex-start;
-        padding: 11px 14px;
-        gap: 12px;
-        border-radius: 11px;
-        width: 100%;
-      }
-      .nav-item span {
-        font-size: 14px;
-        font-weight: 500;
-      }
-      .nav-item.active { background: #F5F4F1; }
-      .nav-item .notif-badge { top: -3px; right: -3px; }
-
-      /* Wider screen content */
-      .screen { padding: 24px 32px 80px; }
-
-      /* Login screen — wider form area */
-      .app-shell > div { flex-direction: row; }
+      .bottom-nav { flex-direction: column; width: 200px; min-width: 200px; border-top: none; border-right: 1px solid #EEEDEB; padding: 16px 10px; height: 100%; align-items: stretch; gap: 2px; }
+      .nav-item { flex-direction: row; justify-content: flex-start; padding: 11px 14px; gap: 12px; border-radius: 11px; width: 100%; }
+      .nav-item span { font-size: 14px; font-weight: 500; } .nav-item.active { background: #F5F4F1; } .nav-item .notif-badge { top: -3px; right: -3px; }
+      .screen { padding: 24px 32px 80px; } .app-shell > div { flex-direction: row; }
     }
-
-    @media (min-width: 1024px) {
-      .app-shell { max-width: 1200px; }
-      .bottom-nav { width: 220px; min-width: 220px; }
-      .screen { padding: 28px 40px 80px; }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+    @media (min-width: 1024px) { .app-shell { max-width: 1200px; } .bottom-nav { width: 220px; min-width: 220px; } .screen { padding: 28px 40px 80px; } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     .fade-in { animation: fadeIn 0.22s ease; }
   </style>
 </head>
 <body>
   <div id="root"></div>
 
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       Data layer
-       ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- ════════════════════════════════════════════════════════════════════════
+       1) CONFIG — paste your Supabase keys here, OR via the in-app Setup screen
+          (which stores them in this browser). Either works.
+       ════════════════════════════════════════════════════════════════════════ -->
   <script>
-// soc-data.js — SOC Checker Data Layer
-
-const OUTLETS = ['Brock'];
-const DEPARTMENTS = ['Kitchen', 'Front Counter', 'Drive Thru', 'Appearance', 'Brower', 'Guest Experience', 'Maintenance'];
-const ROLES = { teamleader: 'Team Leader', trainer: 'Crew Trainer', manager: 'Manager', admin: 'GM / Dept. Manager' };
-
-const SOC_TEMPLATES = [
-  {
-    id: 'tpl_pullforward',
-    name: '5 Point Pull Forward System',
-    department: 'Drive Thru',
-    sections: [
-      {
-        id: 'pf_s1', name: 'DT Presenter', weight: 0.5,
-        items: [
-          { id: 'pf1', text: 'Ensure you have supplies: pen/marker, receipt paper' },
-          { id: 'pf2', text: 'Hand out drinks' },
-          { id: 'pf3', text: 'Let the guest know WHY, WHEN, WHERE they are being pulled forward' },
-          { id: 'pf4', text: 'Point and look to where you want them to go while asking them to pull ahead' },
-          { id: 'pf5', text: 'Press the HOLD button on the bump bar, if applicable' },
-          { id: 'pf6', text: 'Record the entire license plate # on the receipt' },
-          { id: 'pf7', text: 'Place the receipt in the designated spot (tuck a note)' },
-          { id: 'pf8', text: 'Let the shift manager and designated pull forward runner know order is pulled' },
-        ]
-      },
-      {
-        id: 'pf_s2', name: 'Pull Forward Runner', weight: 0.5,
-        items: [
-          { id: 'pf9',  text: 'Keep the safety vest on at all times' },
-          { id: 'pf10', text: 'Ensure apron is stocked with essentials (ketchup, straws, napkins, etc.)' },
-          { id: 'pf11', text: 'Assembles the order and takes the receipt from the tuck a note' },
-          { id: 'pf12', text: 'Asks DT team to serve the order off on their way out to deliver' },
-          { id: 'pf13', text: 'Watches for traffic safety concerns' },
-          { id: 'pf14', text: 'Re-greets and presents order and receipt to driver, asks them to verify order is correct' },
-          { id: 'pf15', text: 'Thanks the guest for their visit and asks for repeat business' },
-        ]
-      }
-    ]
-  },
-  {
-    id: 'tpl_breakfast',
-    name: 'Breakfast Kitchen',
-    department: 'Kitchen',
-    sections: [
-      {
-        id: 'bk_s1', name: 'Initiator', weight: 0.5,
-        items: [
-          { id: 'bk1',  text: 'Ensure current UHC charts are posted' },
-          { id: 'bk2',  text: 'Check for proper muffin and bagel toast continuously throughout breakfast daypart' },
-          { id: 'bk3',  text: 'Immediately calls for assistance when orders go into danger zone (3rd order on screen)' },
-          { id: 'bk4',  text: 'Follows proper bump sequence: place wrap on table, bread on wrap, then bump order' },
-          { id: 'bk5',  text: 'Pairs like sandwiches to make maximum "two-at-a-time" when possible' },
-          { id: 'bk6',  text: 'Untoasted muffins and bagels are completely accessible – no fumbling' },
-          { id: 'bk7',  text: 'Wears a headset to initiate DT orders more quickly' },
-          { id: 'bk8',  text: 'Keeps unnecessary communication to a minimum' },
-          { id: 'bk9',  text: 'Aids toast & bake person when no other order is on screen' },
-          { id: 'bk10', text: 'Manages UHC levels and communicates product needs to batch cooker' },
-          { id: 'bk11', text: 'Empty trays removed immediately from meat/eggs UHC' },
-          { id: 'bk12', text: 'Works as a TEAM – all available hands constantly working on current sandwiches' },
-          { id: 'bk13', text: 'Moves to HLZ-end of UHC table when assembling to allow room for second person' },
-          { id: 'bk14', text: 'Spare sets of tongs ready at all times' },
-        ]
-      },
-      {
-        id: 'bk_s2', name: 'Prep Person', weight: 0.3,
-        items: [
-          { id: 'bk15', text: 'Enough hashbrowns, sausage, bacon, McGriddles in kitchen freezer for entire daypart' },
-          { id: 'bk16', text: 'McGriddles are baked, tempered, and placed in proper pan with holes, false bottom and lid' },
-          { id: 'bk17', text: 'Enough eggs and Hot Cakes in proper kitchen fridge' },
-          { id: 'bk18', text: 'Spare red capped bottle of butter ready with secondary code date marked' },
-          { id: 'bk19', text: 'Enough cheese conditioned and marked with secondary code date and conditioning time' },
-          { id: 'bk20', text: 'Enough breakfast lids and bases at all necessary stations' },
-        ]
-      },
-      {
-        id: 'bk_s3', name: 'Grill', weight: 0.2,
-        items: [
-          { id: 'bk21', text: 'Enough bacon cooked according to charts' },
-          { id: 'bk22', text: 'Bacon is pre-broken in half' },
-          { id: 'bk23', text: 'Disposable gloves are available' },
-          { id: 'bk24', text: 'One grill is on and ready to cook eggs with egg rings and KPTs set up and ready' },
-        ]
-      }
-    ]
-  },
-  {
-    id: 'tpl_kitchen_speed',
-    name: 'Kitchen — Seconds Savers',
-    department: 'Kitchen',
-    sections: [
-      {
-        id: 'ks_s1', name: 'Initiator', weight: 0.4,
-        items: [
-          { id: 'ks1',  text: 'Immediately calls for assistance when orders go into danger zone (3rd order on KVS)' },
-          { id: 'ks2',  text: 'Places the crown in centre of wrap with heel facing up, on side closest to UHC' },
-          { id: 'ks3',  text: 'Follows proper bump sequence (bun into toaster, place wrap/box on table, bump when last sandwich taken)' },
-          { id: 'ks4',  text: 'Pairs like sandwiches to make "two-at-a-time" when possible by looking ahead on KVS' },
-          { id: 'ks5',  text: 'Buns completely accessible – no fumbling (change rack heights if needed, do not overstock bun trays)' },
-          { id: 'ks6',  text: 'Wears a headset to initiate DT orders before they reach KVS' },
-          { id: 'ks7',  text: 'Stores sandwich boxes the way they are placed on the table – does not overstock' },
-          { id: 'ks8',  text: 'Keeps unnecessary communication to a minimum' },
-          { id: 'ks9',  text: 'Does NOT communicate to team what they are taking' },
-          { id: 'ks10', text: 'Aids assembler with last 2 sandwiches when no other order on KVS' },
-        ]
-      },
-      {
-        id: 'ks_s2', name: 'Assembler', weight: 0.4,
-        items: [
-          { id: 'ks11', text: 'Pulls sandwiches versus pushing them to create ownership of product' },
-          { id: 'ks12', text: 'Uses both hands to add condiments and grab enough product for all sandwiches at once' },
-          { id: 'ks13', text: 'Assists assembly of other prep side when idle' },
-          { id: 'ks14', text: 'Keeps additional pans of full condiments ready for rush in kitchen fridge with cover' },
-          { id: 'ks15', text: 'Aids CFN/Meat when idle' },
-          { id: 'ks16', text: 'Manages UHC levels – anticipates and communicates product needs to batch cooker' },
-          { id: 'ks17', text: 'Empty trays removed immediately from UHC' },
-        ]
-      },
-      {
-        id: 'ks_s3', name: 'Meat & Team', weight: 0.2,
-        items: [
-          { id: 'ks18', text: 'Inserts as Chaser when idle (functions between initiator and assembler)' },
-          { id: 'ks19', text: 'Pre-lines meat trays' },
-          { id: 'ks20', text: 'Fully stocked with onions, liners, seasoning, clean grill cloths' },
-          { id: 'ks21', text: 'Spatula and scraper blades are sharp with no nicks or burrs' },
-          { id: 'ks22', text: 'Both sides of prep table ready to go at all times' },
-          { id: 'ks23', text: 'Works as a TEAM – all hands constantly working on current sandwiches' },
-          { id: 'ks24', text: 'During peak times, "aces in their places"' },
-        ]
-      }
-    ]
-  },
-  {
-    id: 'tpl_mcdelivery',
-    name: 'McDelivery',
-    department: 'Front Counter',
-    sections: [
-      {
-        id: 'md_s1', name: 'Assembly', weight: 0.6,
-        items: [
-          { id: 'md1',  text: 'Takes receipt from POS printer and places in assembly area when courier is 3 min away' },
-          { id: 'md2',  text: 'Determines if a small or large bag is required (small for food-only or drinks-only orders)' },
-          { id: 'md3',  text: 'Adds ketchup automatically for all fries/hash brown orders (sm=1 pkt, med=2, lg=3)' },
-          { id: 'md4',  text: 'All beverages completed while waiting for food and placed in drink tray' },
-          { id: 'md5',  text: 'Places 2 of the 3 stickers on the bag while waiting for food' },
-          { id: 'md6',  text: 'Places drink tray in bag first, then beverages into drink tray' },
-          { id: 'md7',  text: 'Sandwiches and/or platters placed in A, B, C, or D bags determined by order size' },
-          { id: 'md8',  text: 'Does not over-fill bags; fries are standing up straight' },
-          { id: 'md9',  text: 'Completed food bags are double folded to retain heat' },
-          { id: 'md10', text: 'Fries, hashbrowns, poutines not bagged until driver arrives and identifies themselves' },
-          { id: 'md11', text: 'Desserts, smoothies, and frappes prepared ahead but are the last items prepared' },
-          { id: 'md12', text: 'All service items included (spoons, straws, etc.)' },
-        ]
-      },
-      {
-        id: 'md_s2', name: 'Driver Handoff', weight: 0.4,
-        items: [
-          { id: 'md13', text: 'Greets courier upon arrival and confirms order number from their phone' },
-          { id: 'md14', text: 'Adds fries, hashbrowns or poutine to the order upon driver arrival' },
-          { id: 'md15', text: 'Double checks order for accuracy with the Pick Ticket' },
-          { id: 'md16', text: 'Checks for condiments' },
-          { id: 'md17', text: 'Double folds any remaining inner bags and places food bags in large rope handled delivery bag' },
-          { id: 'md18', text: 'Seals large rope handled bags with 3 stickers; order details filled in if not already complete' },
-          { id: 'md19', text: 'Hands courier partner ALL bags in the order AT THE SAME TIME' },
-          { id: 'md20', text: 'Completes an appropriate farewell and asks courier to swipe the order on their phone' },
-        ]
-      }
-    ]
-  },
-  {
-    id: 'tpl_bestburger',
-    name: 'Best Burger Grill Procedures',
-    department: 'Kitchen',
-    sections: [
-      {
-        id: 'bb_s1', name: 'Cooking Procedures', weight: 0.4,
-        items: [
-          { id: 'bb1',  text: 'Maximum run size for regular meat is 6; for 1/4 patties is 4' },
-          { id: 'bb2',  text: 'Looks at monitor & determines # of patties to cook, then bumps screen' },
-          { id: 'bb3',  text: 'Puts on blue gloves before handling frozen patties' },
-          { id: 'bb4',  text: 'Grill is set to Auto Detect' },
-          { id: 'bb5',  text: 'Lifts first clam, retrieves patties from grill-side freezer, lays under platen using both hands (2 at a time)' },
-          { id: 'bb6',  text: 'Uses knuckle or back of hand/wrist to lower the clam' },
-          { id: 'bb7',  text: 'Positions 2 or more meat trays with new tray liners at grill' },
-          { id: 'bb8',  text: 'Repeats for second clam if applicable, then removes gloves' },
-          { id: 'bb9',  text: 'Gets spatula, hutzler, and grill seasoning ready while waiting for clam to rise' },
-        ]
-      },
-      {
-        id: 'bb_s2', name: 'Look & Cook', weight: 0.2,
-        items: [
-          { id: 'bb10', text: 'Aware of meat cabinet levels and refers to cabinet charts to maintain target amount' },
-          { id: 'bb11', text: 'Cooks to replenish cabinet levels as orders come up on screen' },
-          { id: 'bb12', text: 'Listens for what is being wasted to replenish and maintain target cabinet levels' },
-        ]
-      },
-      {
-        id: 'bb_s3', name: 'Grill Scraping & Teflon', weight: 0.2,
-        items: [
-          { id: 'bb13', text: 'Scrapes grill and squeegeees teflon after every run' },
-          { id: 'bb14', text: 'Grill surface steamed and teflons wiped with grill cloth minimally every 15 minutes' },
-          { id: 'bb15', text: 'Uses grill cloth to clean each spatula prior to steaming the grill' },
-          { id: 'bb16', text: 'Disposes of grill cloth in soiled grill cloth bucket after spatulas and grill have been steamed' },
-        ]
-      },
-      {
-        id: 'bb_s4', name: 'Meat Removal & Quality', weight: 0.2,
-        items: [
-          { id: 'bb17', text: 'Uses proper sized spatula – no meat left on grill as a result of tearing' },
-          { id: 'bb18', text: 'Spatula held at 45 degree angle with enough force to cut meat off grill in one motion' },
-          { id: 'bb19', text: 'Spatula wiped using grill squeegee after each use; excess onions scraped onto patties into tray' },
-          { id: 'bb20', text: 'First 3 regular patties removed in one stack, then remaining 3; 1/4 patties one at a time' },
-          { id: 'bb21', text: 'Seasoning dispenser centered over each patty with correct amount dispensed evenly' },
-          { id: 'bb22', text: 'Hammer action used with proper amount of onions on each patty' },
-          { id: 'bb23', text: '15 & 18 second removal times being met' },
-          { id: 'bb24', text: 'Minimum 2 seasoning dispensers in use' },
-          { id: 'bb25', text: 'A fresh liner is used for every run of meat' },
-          { id: 'bb26', text: 'Beef consistently cooked and removed within quality temperature zone 71°C–79°C' },
-          { id: 'bb27', text: 'UHC timer activated after meat is placed in cabinet' },
-          { id: 'bb28', text: 'All patties are Tender, Juicy, Seared, Seasoned' },
-        ]
-      }
-    ]
-  },
-  {
-    id: 'tpl_condiment',
-    name: 'Condiment SOC',
-    department: 'Kitchen',
-    sections: [      {
-        id: 'cs_s1', name: 'Station Stock & Prep', weight: 0.3,
-        items: [
-          { id: 'cs1', text: 'Station is stocked with all sauce guns and bottles – no mayo gun used in place of bottles' },
-          { id: 'cs2', text: 'Cheese is conditioned and stocked' },
-          { id: 'cs3', text: 'Prep fridge stocked with cucumbers, shredded cheese, and backup sauce bottles with code dates' },
-        ]
-      },
-      {
-        id: 'cs_s2', name: 'Sandwiches', weight: 0.4,
-        items: [
-          { id: 'cs4', text: 'Only chicken sandwiches receive mayo from the sauce gun; all other sandwiches use a sauce bottle' },
-          { id: 'cs5', text: 'Quarter BLTs and sandwiches with extra mayo get sauce from bottle in the shape of a stop sign' },
-          { id: 'cs6', text: 'Extra sauce is added to the bottom bun of a sandwich' },
-          { id: 'cs7', text: 'Any additional sauce added to a sandwich receives sauce in the shape of a stop sign' },
-          { id: 'cs8', text: 'Extra pickles is double the standard amount (Cheeseburger=2, McDouble=4)' },
-          { id: 'cs9', text: 'Soufflé cups only filled halfway with two pumps of sauce' },
-        ]
-      },
-      {
-        id: 'cs_s3', name: 'Wraps', weight: 0.3,
-        items: [
-          { id: 'cs10', text: 'Recognizes and utilizes the build zone for wraps' },
-          { id: 'cs11', text: 'McWraps receive two small hot lid\'s worth of lettuce such that build zone is fully covered' },
-          { id: 'cs12', text: 'Snack wraps receive one small hot lid worth of lettuce' },
-          { id: 'cs13', text: 'McWraps are made using the quadruple arch sauce technique in the build zone' },
-          { id: 'cs14', text: 'Snack wraps are made with one single line of sauce using the sauce bottles' },
-        ]
-      }
-    ]
-  },
-  {
-    id: 'tpl_cones',
-    name: 'Cones Mini SOC',
-    department: 'Kitchen',
-    sections: [{
-      id: 'cn_s1', name: 'Checklist', weight: 1,
-      items: [
-        { id: 'cn1', text: 'Using the diameter of the cone as a guide for the first swirl, circles the cone 5 times so ice cream reaches 5 inches (or 4.5 swirls) above the cone' },
-        { id: 'cn2', text: 'Weighs the cone to ensure it is 5oz' },
-      ]
-    }]
-  },
-  {
-    id: 'tpl_order_accuracy',
-    name: 'Kitchen Order Accuracy',
-    department: 'Kitchen',
-    sections: [{
-      id: 'oa_s1', name: 'Checklist', weight: 1,
-      items: [
-        { id: 'oa1', text: 'A headset is being worn by the initiator' },
-        { id: 'oa2', text: 'Clear communication of grill orders down the line with SLIP PLACEMENT (FACE UP)' },
-        { id: 'oa3', text: 'In the case of an "Ask Me" Initiator, the order taker asks what the "Ask Me" is and communicates to the assembler' },
-        { id: 'oa4', text: 'Assembler does final check for accuracy' },
-        { id: 'oa5', text: 'Bump order only after the grill slip or tab is pulled on the box' },
-      ]
-    }]
-  },
-  {
-    id: 'tpl_smart_retailing',
-    name: 'Smart Retailing',
-    department: 'Front Counter',
-    sections: [
-      {
-        id: 'sr_s1', name: 'Key Behaviours', weight: 0.6,
-        items: [
-          { id: 'sr1', text: 'Engaging tone of voice and body language' },
-          { id: 'sr2', text: 'Eye contact maintained throughout the interaction' },
-          { id: 'sr3', text: 'Friendly throughout the order taking process – SMILE (see it, hear it)' },
-          { id: 'sr4', text: 'Uses time-of-day appropriate greeting' },
-          { id: 'sr5', text: 'Uses pairing options when suggesting items' },
-          { id: 'sr6', text: 'Eliminates banned phrases ("Is that all?", "Just the sandwich?", "Was that a small?", etc.)' },
-          { id: 'sr7', text: 'Uses recommended phrases ("My favourite", "I recommend", "Only $___", "Premium Roast coffee", "Freshly made", etc.)' },
-          { id: 'sr8', text: 'Does NOT retail to obvious guests (exact change, children, "that\'s all", etc.)' },
-        ]
-      },
-      {
-        id: 'sr_s2', name: 'Retailing Techniques (min. 1 required per applicable order)', weight: 0.4,
-        items: [
-          { id: 'sr9',  text: 'Order clarification – commonly asking about a larger size' },
-          { id: 'sr10', text: 'Feature Item – spotlighting new, specific, or LTO products' },
-          { id: 'sr11', text: 'Core Four – filling in a missing sandwich, side, beverage, or dessert' },
-          { id: 'sr12', text: 'Tailor Suggestions – suggesting a matching item based on what the guest already ordered' },
-        ]
-      }
-    ]
-  },
-  {
-    id: 'tpl_pushpull',
-    name: 'Push/Pull Kitchen Procedure',
-    department: 'Kitchen',
-    sections: [{
-      id: 'pp_s1', name: 'Checklist', weight: 1,
-      items: [
-        { id: 'pp1', text: 'Initiator responds to KVS and follows the bun-box-bump procedure' },
-        { id: 'pp2', text: 'Initiator communicates special requests to Assembler using pull tab or grill slip (e.g. No Onions, Extra Pickle)' },
-        { id: 'pp3', text: 'Initiator stays assembling the sandwich(es) until Assembler takes over – sandwiches are never abandoned' },
-        { id: 'pp4', text: 'Assembler "pulls" the sandwich(es) allowing Initiator to start the next order – Initiator never "pushes" to Assembler' },
-      ]
-    }]
-  },
-  {
-    id: 'tpl_ordercomplete',
-    name: 'Order Complete / NBLZ',
-    department: 'Front Counter',
-    sections: [
-      {
-        id: 'oc_s1', name: 'NBLZ (Non-BDAP)', weight: 0.4,
-        items: [
-          { id: 'oc1', text: 'Runner picks small orders from Assembly Monitor and places PICK TICKET on the NBLZ mat' },
-          { id: 'oc2', text: 'Beverage person presents order to guest as soon as drink is prepared' },
-          { id: 'oc3', text: 'Runner uses NBLZ for beverages-only, coffee + baked good, or completed food waiting for a drink' },
-        ]
-      },
-      {
-        id: 'oc_s2', name: 'Order Complete Button', weight: 0.4,
-        items: [
-          { id: 'oc4', text: 'Order taker presses "Order Complete" button on POS for simple orders they can complete themselves' },
-          { id: 'oc5', text: 'Runner prints pick ticket, serves off Present Monitor, and removes from ORB by tapping order TWICE' },
-          { id: 'oc6', text: 'Order taker OWNS the order and completes it themselves once "Order Complete" is pressed' },
-        ]
-      },
-      {
-        id: 'oc_s3', name: 'BDAP Locations', weight: 0.2,
-        items: [
-          { id: 'oc7', text: 'Runner clears order from assembly screen only once BDAP person places drink on NBLZ' },
-          { id: 'oc8', text: 'Runner grabs drink from NBLZ with pick ticket in hand and presents to guest' },
-        ]
-      }
-    ]
-  },
-  {
-    id: 'tpl_mobileorder',
-    name: 'Mobile Order (ROA)',
-    department: 'Front Counter',
-    sections: [
-      {
-        id: 'mo_s1', name: 'Readiness', weight: 0.2,
-        items: [
-          { id: 'mo1', text: 'Has McDonald\'s App on phone and is familiar with using it to aid guests' },
-          { id: 'mo2', text: 'Has set a target for the shift with manager' },
-          { id: 'mo3', text: 'Service apron is on and stocked with a little bit of everything' },
-        ]
-      },
-      {
-        id: 'mo_s2', name: 'Assembly', weight: 0.2,
-        items: [
-          { id: 'mo4', text: 'Assembles order as it appears on monitor according to "order of assembly"' },
-          { id: 'mo5', text: 'Able to "Pick and GO" efficiently' },
-          { id: 'mo6', text: 'Double checks order for accuracy' },
-          { id: 'mo7', text: 'Places pick ticket sticker in the middle of the bag' },
-          { id: 'mo8', text: 'Does not make ice cream products until the guest arrives' },
-        ]
-      },
-      {
-        id: 'mo_s3', name: 'Front Counter', weight: 0.2,
-        items: [
-          { id: 'mo9',  text: 'Presents order by calling out guest\'s name (order # only if no name or unsure of pronunciation)' },
-          { id: 'mo10', text: 'Places order in designated area with pick ticket facing dining room if guest has not arrived' },
-          { id: 'mo11', text: 'SMILEs and thanks the guest; follows correct procedures for serving the order off' },
-        ]
-      },
-      {
-        id: 'mo_s4', name: 'Drive Thru', weight: 0.2,
-        items: [
-          { id: 'mo12', text: 'Order taker greets guest by name (if provided) once order number is given; confirms order accuracy' },
-          { id: 'mo13', text: 'Cashier greets the guest by name' },
-          { id: 'mo14', text: 'Presenter smiles, makes eye contact, mentions key items, confirms condiments; bag is double folded; thanks guest' },
-        ]
-      },
-      {
-        id: 'mo_s5', name: 'Curbside', weight: 0.2,
-        items: [
-          { id: 'mo15', text: 'Gives personalized greeting at vehicle using guest\'s name if provided' },
-          { id: 'mo16', text: 'Presents order and calls out any special items' },
-          { id: 'mo17', text: 'Asks guest to double check their order, then thanks them for their visit' },
-        ]
-      }
-    ]
-  },
-  {
-    id: 'tpl_brower',
-    name: 'Martin Brower Checklist',
-    department: 'Brower',
-    sections: [
-      {
-        id: 'mb_s1', name: 'Pre-Delivery', weight: 0.3,
-        items: [
-          { id: 'mb1', text: 'Reposition freezer & walk-in stock to accommodate new stock, ensuring proper rotation (FIFO); inspect and clean floors, thresholds, and underneath all shelving' },
-          { id: 'mb2', text: 'Move DT clearance sign if necessary; remove ladders, garbage and obstructions from delivery corridors' },
-          { id: 'mb3', text: 'Move all empty bun trays and milk crates outside and store them safely' },
-          { id: 'mb4', text: 'Reviewed safe lifting practices (examine load weight, ask for help if needed, safe techniques)' },
-          { id: 'mb5', text: 'If using NestaFlex Gravity Conveyor, Manager reviews safe use and warnings before each use' },
-        ]
-      },
-      {
-        id: 'mb_s2', name: 'During Delivery', weight: 0.4,
-        items: [
-          { id: 'mb6',  text: 'Places "detour" sign/chains off the Drive-Thru entrance lane (if applicable)' },
-          { id: 'mb7',  text: 'Air curtains left in place at all times to maintain freezer and walk-in temperatures' },
-          { id: 'mb8',  text: 'Shell eggs are on the lowest shelf (food safety)' },
-          { id: 'mb9',  text: 'Proper lifting techniques used – bend knees, use legs NOT back' },
-          { id: 'mb10', text: 'Tender Loving Care used with all sensitive products (especially FRIES)' },
-          { id: 'mb11', text: 'Ensures 2-inch gap between product and walls/other boxes using empty bun trays along perimeter' },
-          { id: 'mb12', text: 'Empty milk crate placed in front of delivery door to prevent product from opening panic bar (if applicable)' },
-          { id: 'mb13', text: 'No employees on the Brower Truck for any reason' },
-          { id: 'mb14', text: 'Path from truck to unloading area is clear for free and safe movement' },
-          { id: 'mb15', text: 'Fridge & freezer pallets unloaded within max 10 minutes each; 2 people navigate carts when in motion' },
-          { id: 'mb16', text: 'Buns moved directly from truck into freezer; no product left unattended' },
-        ]
-      },
-      {
-        id: 'mb_s3', name: 'Post-Delivery', weight: 0.3,
-        items: [
-          { id: 'mb17', text: 'Bottled water placed in walk-in refrigerator' },
-          { id: 'mb18', text: '"Detour" sign removed, DT entrance unblocked, clearance sign moved back' },
-          { id: 'mb19', text: 'ALL stock properly rotated (FIFO) and placed correctly with product names facing forward' },
-          { id: 'mb20', text: 'Yogurt tube cambro containers prepped with lids (minimum 6-8)' },
-          { id: 'mb21', text: 'Product name and EXPIRY DATE recorded on boxes in walk-in refrigerator (dressings, cheeses, sauces, etc.)' },
-          { id: 'mb22', text: 'Tomatoes placed on bun trays with fresh liners, stem side down, max 20-25 per tray, AT ROOM TEMPERATURE – NEVER IN FRIDGE' },
-          { id: 'mb23', text: 'All Operating Supplies placed in appropriate spots and reorganized if necessary' },
-          { id: 'mb24', text: 'Non-Product entered in Excel Non-Product Tracker' },
-          { id: 'mb25', text: 'Completed checklist placed in Food Safety Binder under "Brower Delivery Checklist" tab' },
-        ]
-      }
-    ]
-  },
-];
-
-
-const INITIAL_USERS = [
-  { id: 'u1',  name: 'Alex B.',    role: 'teamleader', outlet: 'Brock' },
-  { id: 'u2',  name: 'Jordan M.',  role: 'teamleader', outlet: 'Brock' },
-  { id: 'u3',  name: 'Sam T.',     role: 'teamleader', outlet: 'Brock' },
-  { id: 'u4',  name: 'Rachel C.',  role: 'trainer',    outlet: 'Brock' },
-  { id: 'u5',  name: 'Tom B.',     role: 'trainer',    outlet: 'Brock' },
-  { id: 'u6',  name: 'Ashley B.',  role: 'manager',    outlet: 'Brock' },
-  { id: 'u7',  name: 'James K.',   role: 'manager',    outlet: 'Brock' },
-  { id: 'u15', name: 'Admin',      role: 'admin',      outlet: 'All'   },
-];
-
-function calculateScore(template, itemRatings) {
-  let weightedTotal = 0, weightSum = 0;
-  template.sections.forEach(sec => {
-    let pts = 0;
-    sec.items.forEach(item => {
-      const r = itemRatings[item.id];
-      pts += r === 'pass' ? 1 : 0;
-    });
-    const secScore = sec.items.length > 0 ? pts / sec.items.length : 0;
-    weightedTotal += secScore * sec.weight;
-    weightSum += sec.weight;
-  });
-  return weightSum > 0 ? Math.round((weightedTotal / weightSum) * 100) : 0;
-}
-
-function generateSeedChecks() {
-  // No built-in templates — admin uploads their own via the Library tab
-  return [];
-}
-
-const STORAGE_KEY = 'soc_checker_v9';
-
-function loadAppData() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const data = JSON.parse(raw);
-      const tplIds = data.templates.map(t => t.id);
-      SOC_TEMPLATES.forEach(t => { if (!tplIds.includes(t.id)) data.templates.push(t); });
-      if (!data.users || !data.users.length) data.users = INITIAL_USERS;
-      if (!data.notifications) data.notifications = [];
-      return data;
-    }
-  } catch(e) {}
-
-  const checks = generateSeedChecks();
-  return { users: INITIAL_USERS, templates: SOC_TEMPLATES, checks, notifications: [] };
-}
-
-function saveAppData(data) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
-}
-
-function fmtDate(ds) {
-  if (!ds) return '—';
-  const d = new Date(ds + 'T00:00:00');
-  return d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
-}
-
-function todayStr() { return new Date().toISOString().split('T')[0]; }
-
-function scoreStyle(score) {
-  if (score >= 80) return { color: '#059669', bg: '#DCFCE7' };
-  if (score >= 60) return { color: '#D97706', bg: '#FEF3C7' };
-  return { color: '#DC2626', bg: '#FEE2E2' };
-}
-
-function exportCSV(rows, headers, filename) {
-  const csv = [headers, ...rows]
-    .map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(','))
-    .join('\n');
-  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = filename + '.csv'; a.click();
-  URL.revokeObjectURL(url);
-}
+    window.SOC_CONFIG = {
+      url: "",        // e.g. https://abcdefgh.supabase.co
+      anonKey: ""     // your project's PUBLIC anon key (safe to ship)
+    };
   </script>
 
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       App
-       ═══════════════════════════════════════════════════════════════════════ -->
-  <script type="text/babel">
-// soc-app.jsx — SOC Checker React App
+  <!-- ════════════════════════════════════════════════════════════════════════
+       2) Client-side helpers + Supabase data layer (no JSX)
+       ════════════════════════════════════════════════════════════════════════ -->
+  <script>
+    const DEPARTMENTS = ['Kitchen', 'Front Counter', 'Drive Thru', 'Appearance', 'Brower', 'Guest Experience', 'Maintenance'];
+    const ROLES = { teamleader: 'Team Leader', trainer: 'Crew Trainer', manager: 'Manager', admin: 'GM / Dept. Manager' };
+
+    function calculateScore(template, itemRatings) {
+      let weightedTotal = 0, weightSum = 0;
+      template.sections.forEach(sec => {
+        let pts = 0;
+        sec.items.forEach(item => { pts += itemRatings[item.id] === 'pass' ? 1 : 0; });
+        const secScore = sec.items.length > 0 ? pts / sec.items.length : 0;
+        weightedTotal += secScore * sec.weight; weightSum += sec.weight;
+      });
+      return weightSum > 0 ? Math.round((weightedTotal / weightSum) * 100) : 0;
+    }
+    function fmtDate(ds) {
+      if (!ds) return '—';
+      const d = new Date(String(ds).slice(0, 10) + 'T00:00:00');
+      return d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+    function todayStr() { return new Date().toISOString().split('T')[0]; }
+    function scoreStyle(score) {
+      if (score >= 80) return { color: '#059669', bg: '#DCFCE7' };
+      if (score >= 60) return { color: '#D97706', bg: '#FEF3C7' };
+      return { color: '#DC2626', bg: '#FEE2E2' };
+    }
+    function exportCSV(rows, headers, filename) {
+      const csv = [headers, ...rows].map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\n');
+      const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = filename + '.csv'; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // ── Supabase data layer ────────────────────────────────────────────────
+    const SocDB = (function () {
+      const CONF_KEY = 'soc_supabase_config';
+      function loadConfig() {
+        try { const c = JSON.parse(localStorage.getItem(CONF_KEY) || 'null'); if (c && c.url && c.anonKey) return c; } catch (e) {}
+        return (window.SOC_CONFIG && window.SOC_CONFIG.url) ? window.SOC_CONFIG : { url: '', anonKey: '' };
+      }
+      let CONFIG = loadConfig();
+      let client = null;
+
+      function configured() { return !!(CONFIG.url && CONFIG.anonKey); }
+      function saveConfig(url, anonKey) {
+        CONFIG = { url: url.trim().replace(/\/$/, ''), anonKey: anonKey.trim() };
+        localStorage.setItem(CONF_KEY, JSON.stringify(CONFIG));
+      }
+      function init() { if (!client && configured()) client = window.supabase.createClient(CONFIG.url, CONFIG.anonKey); return client; }
+
+      async function loginDirectory() { const { data, error } = await client.rpc('login_directory'); if (error) throw error; return data || []; }
+      async function signIn(email, pin) { const { error } = await client.auth.signInWithPassword({ email, password: pin }); if (error) throw error; }
+      async function signOut() { try { await client.auth.signOut(); } catch (e) {} }
+
+      function mapUser(p) { return { id: p.id, name: p.display_name, role: p.role, outlet: p.outlet }; }
+      async function currentUser() {
+        const { data } = await client.auth.getUser();
+        if (!data || !data.user) return null;
+        const { data: p } = await client.from('profiles').select('*').eq('id', data.user.id).single();
+        return p ? mapUser(p) : null;
+      }
+      function mapCheck(c) {
+        return { id: c.id, date: c.date, outlet: c.outlet, traineeName: c.trainee_name, trainerId: c.trainer_id,
+          trainerName: c.trainer_name, managerId: null, managerName: '—', templateId: c.template_id, templateName: c.template_name,
+          department: c.department, itemRatings: c.item_ratings, score: c.score, comment: c.comment, hasFail: c.has_fail };
+      }
+      async function loadData() {
+        const [pr, tp, ck] = await Promise.all([
+          client.from('profiles').select('*').order('display_name'),
+          client.from('templates').select('*').order('name'),
+          client.from('checks').select('*').order('date', { ascending: false }).order('created_at', { ascending: false }),
+        ]);
+        if (pr.error) throw pr.error; if (tp.error) throw tp.error; if (ck.error) throw ck.error;
+        return {
+          users: (pr.data || []).map(mapUser),
+          templates: (tp.data || []).map(t => ({ id: t.id, name: t.name, department: t.department, sections: t.sections })),
+          checks: (ck.data || []).map(mapCheck),
+        };
+      }
+      async function insertCheck(c) {
+        const row = { date: c.date, outlet: c.outlet, trainee_name: c.traineeName, trainer_id: c.trainerId || null,
+          trainer_name: c.trainerName, template_id: c.templateId, template_name: c.templateName, department: c.department || null,
+          item_ratings: c.itemRatings, score: c.score, comment: c.comment || '', has_fail: c.hasFail };
+        const { error } = await client.from('checks').insert(row); if (error) throw error;
+      }
+      async function addTemplates(tpls) {
+        const rows = tpls.map(t => ({ id: t.id, name: t.name, department: t.department, sections: t.sections }));
+        const { error } = await client.from('templates').insert(rows); if (error) throw error;
+      }
+      async function deleteTemplate(id) { const { error } = await client.from('templates').delete().eq('id', id); if (error) throw error; }
+
+      async function adminAction(body) {
+        const { data: sess } = await client.auth.getSession();
+        const token = (sess && sess.session && sess.session.access_token) || CONFIG.anonKey;
+        const res = await fetch(CONFIG.url + '/functions/v1/admin-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, 'apikey': CONFIG.anonKey },
+          body: JSON.stringify(body),
+        });
+        let out; try { out = await res.json(); } catch (e) { out = {}; }
+        if (!res.ok) throw new Error(out.error || ('Server error (' + res.status + ')'));
+        return out;
+      }
+      async function addUser(u) { return adminAction({ action: 'create', display_name: u.name, role: u.role, pin: u.pin, outlet: 'Brock' }); }
+      async function removeUser(id) { return adminAction({ action: 'delete', id }); }
+
+      return { configured, saveConfig, getConfig: () => CONFIG, init, loginDirectory, signIn, signOut,
+        currentUser, loadData, insertCheck, addTemplates, deleteTemplate, addUser, removeUser };
+    })();
+  </script>
+
+  <!-- ════════════════════════════════════════════════════════════════════════
+       3) App (JSX)
+       ════════════════════════════════════════════════════════════════════════ -->
+  <script type="text/babel" data-presets="react">
 const { useState, useEffect, useRef, useMemo } = React;
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
 function Icon({ name, size = 20, color = 'currentColor', sw = 1.8 }) {
   const icons = {
     home: <><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></>,
     plus: <><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></>,
     list: <><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" /></>,
-    bell: <><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 01-3.46 0" /></>,
     chart: <><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></>,
     check: <polyline points="20 6 9 17 4 12" />,
     x: <><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>,
     chevR: <polyline points="9 18 15 12 9 6" />,
     chevL: <polyline points="15 18 9 12 15 6" />,
-    chevD: <polyline points="6 9 12 15 18 9" />,
     upload: <><polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3" /></>,
     logout: <><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></>,
     alert: <><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></>,
     download: <><polyline points="8 17 12 21 16 17" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.88 18.09A5 5 0 0018 9h-1.26A8 8 0 103 16.11" /></>,
     folder: <><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" /></>,
-    user: <><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" /></>
+    user: <><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" /></>,
+    lock: <><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0110 0v4" /></>,
   };
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
-      {icons[name] || null}
-    </svg>);
-
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">{icons[name] || null}</svg>;
 }
 
-// ─── UI Primitives ─────────────────────────────────────────────────────────────
-function ScorePill({ score }) {
-  const s = scoreStyle(score);
-  return <span className="score-pill" style={{ color: s.color, background: s.bg }}>{score}%</span>;
-}
-
+function ScorePill({ score }) { const s = scoreStyle(score); return <span className="score-pill" style={{ color: s.color, background: s.bg }}>{score}%</span>; }
 const ROLE_COLOR = { teamleader: '#2563EB', trainer: '#7C3AED', manager: '#059669', admin: '#D97706' };
 
-// ─── Login Screen ─────────────────────────────────────────────────────────────
-function LoginScreen({ users: allUsers, onLogin }) {
-  const [role, setRole] = React.useState('');
+function Hero() {
+  return (
+    <div style={{ background: 'linear-gradient(145deg, #0F4C8A 0%, #1565C0 45%, #6A1FC2 100%)', padding: '64px 28px 52px', textAlign: 'center', position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
+      <div style={{ position: 'absolute', top: -50, right: -50, width: 180, height: 180, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
+      <div style={{ position: 'absolute', bottom: -40, left: -30, width: 140, height: 140, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+      <div style={{ position: 'absolute', top: 30, left: 20, width: 60, height: 60, borderRadius: '50%', background: 'rgba(255,255,255,0.06)' }} />
+      <div style={{ position: 'relative', zIndex: 1, margin: '0 auto 20px', width: 80, height: 80 }}>
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+          <defs><linearGradient id="logoInner" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop stopColor="#38BDF8" /><stop offset="1" stopColor="#818CF8" /></linearGradient></defs>
+          <circle cx="40" cy="40" r="39" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" />
+          <circle cx="40" cy="40" r="34" fill="url(#logoInner)" opacity="0.95" />
+          <circle cx="40" cy="40" r="27" stroke="rgba(255,255,255,0.25)" strokeWidth="1" />
+          <path d="M22 40 L34 53 L58 27" stroke="white" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </div>
+      <h1 style={{ fontSize: 32, fontWeight: 800, color: '#fff', letterSpacing: '-0.04em', marginBottom: 8, position: 'relative', zIndex: 1, textShadow: '0 2px 12px rgba(0,0,0,0.2)' }}>SOC Checker</h1>
+      <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.72)', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase', position: 'relative', zIndex: 1 }}>Brock Outlet · Standards of Operations</p>
+    </div>
+  );
+}
 
-  const users = React.useMemo(() =>
-  role ? allUsers.filter((u) => u.role === role) : [],
-  [role, allUsers]);
+// ─── Setup Screen (shown until Supabase is configured) ─────────────────────────
+function SetupScreen() {
+  const c = SocDB.getConfig();
+  const [url, setUrl] = useState(c.url || '');
+  const [key, setKey] = useState(c.anonKey || '');
+  const ok = url.trim().startsWith('http') && key.trim().length > 20;
+  return (
+    <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Hero />
+      <div style={{ flex: 1, padding: '28px 24px 48px', background: '#F7F6F3' }}>
+        <div className="card" style={{ marginBottom: 16, background: '#EFF6FF', border: '1px solid #BFDBFE' }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#1E40AF', marginBottom: 6 }}>One-time setup</div>
+          <p style={{ fontSize: 13, color: '#1E3A5F', lineHeight: 1.5 }}>Paste your Supabase project URL and <b>anon</b> public key. In Supabase: <b>Project Settings → API</b>. These are safe to use in the browser. See SETUP.md for the full guide.</p>
+        </div>
+        <p className="label">Project URL</p>
+        <input className="soc-input" placeholder="https://xxxx.supabase.co" value={url} onChange={e => setUrl(e.target.value)} style={{ marginBottom: 16 }} />
+        <p className="label">Anon public key</p>
+        <textarea className="soc-input" rows={3} placeholder="eyJhbGci..." value={key} onChange={e => setKey(e.target.value)} style={{ marginBottom: 20, resize: 'vertical', fontSize: 13 }} />
+        <button className="btn-primary" disabled={!ok} style={{ opacity: ok ? 1 : 0.35 }}
+          onClick={() => { SocDB.saveConfig(url, key); window.location.reload(); }}>Connect</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Login (pick name + 6-digit PIN) ───────────────────────────────────────────
+function LoginScreen({ onAuthed }) {
+  const [dir, setDir] = useState(null);
+  const [role, setRole] = useState('');
+  const [pending, setPending] = useState(null);
+  const [pin, setPin] = useState('');
+  const [err, setErr] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => { (async () => {
+    try { setDir(await SocDB.loginDirectory()); }
+    catch (e) { setErr('Could not reach the server. Check your setup.'); setDir([]); }
+  })(); }, []);
+
+  const names = useMemo(() => (dir || []).filter(u => u.role === role), [dir, role]);
+
+  async function submit(p) {
+    if (busy) return;
+    setBusy(true); setErr('');
+    try { await SocDB.signIn(pending.email, p); await onAuthed(); }
+    catch (e) { setErr('Incorrect PIN. Try again.'); setPin(''); setBusy(false); }
+  }
+  function press(d) {
+    if (busy) return;
+    setErr('');
+    const next = (pin + d).slice(0, 6);
+    setPin(next);
+    if (next.length === 6) submit(next);
+  }
 
   return (
     <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
-
-      {/* ── Gradient hero ── */}
-      <div style={{
-        background: 'linear-gradient(145deg, #0F4C8A 0%, #1565C0 45%, #6A1FC2 100%)',
-        padding: '64px 28px 52px',
-        textAlign: 'center',
-        position: 'relative',
-        overflow: 'hidden',
-        flexShrink: 0
-      }}>
-        {/* decorative blobs */}
-        <div style={{ position: 'absolute', top: -50, right: -50, width: 180, height: 180, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
-        <div style={{ position: 'absolute', bottom: -40, left: -30, width: 140, height: 140, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
-        <div style={{ position: 'absolute', top: 30, left: 20, width: 60, height: 60, borderRadius: '50%', background: 'rgba(255,255,255,0.06)' }} />
-
-        {/* Logo mark */}
-        <div style={{ position: 'relative', zIndex: 1, margin: '0 auto 20px', width: 80, height: 80 }}>
-          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-            <defs>
-              <linearGradient id="logoInner" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#38BDF8" />
-                <stop offset="1" stopColor="#818CF8" />
-              </linearGradient>
-            </defs>
-            {/* outer glow ring */}
-            <circle cx="40" cy="40" r="39" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" />
-            {/* badge face */}
-            <circle cx="40" cy="40" r="34" fill="url(#logoInner)" opacity="0.95" />
-            {/* inner subtle ring */}
-            <circle cx="40" cy="40" r="27" stroke="rgba(255,255,255,0.25)" strokeWidth="1" />
-            {/* bold checkmark */}
-            <path d="M22 40 L34 53 L58 27" stroke="white" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-
-        <h1 style={{
-          fontSize: 32, fontWeight: 800, color: '#fff',
-          letterSpacing: '-0.04em', marginBottom: 8,
-          position: 'relative', zIndex: 1,
-          textShadow: '0 2px 12px rgba(0,0,0,0.2)'
-        }}>SOC Checker</h1>
-        <p style={{
-          fontSize: 13, color: 'rgba(255,255,255,0.72)',
-          fontWeight: 500, letterSpacing: '0.04em',
-          textTransform: 'uppercase', position: 'relative', zIndex: 1
-        }}>Brock Outlet · Standards of Operations</p>
-      </div>
-
-      {/* ── Form area ── */}
+      <Hero />
       <div style={{ flex: 1, padding: '30px 24px 48px', background: '#F7F6F3' }}>
-        <p className="label">Your Role</p>
-        <select
-          className="soc-input soc-select"
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
-          style={{ marginBottom: 24 }}>
+        {!pending && <>
+          {dir === null && <p style={{ fontSize: 14, color: '#78716C' }}>Loading…</p>}
+          {dir && <>
+            <p className="label">Your Role</p>
+            <select className="soc-input soc-select" value={role} onChange={e => setRole(e.target.value)} style={{ marginBottom: 24 }}>
+              <option value="">Select your role...</option>
+              <option value="teamleader">Team Leader</option>
+              <option value="trainer">Crew Trainer</option>
+              <option value="manager">Manager</option>
+              <option value="admin">GM / Dept. Manager</option>
+            </select>
+            {role && <div className="fade-in">
+              <p className="label">Select Your Name</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {names.map(u => (
+                  <button key={u.id} onClick={() => { setPending(u); setPin(''); setErr(''); }} className="login-row">
+                    <div style={{ width: 40, height: 40, borderRadius: 99, flexShrink: 0, background: ROLE_COLOR[u.role] + '1A', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1.5px solid ${ROLE_COLOR[u.role]}30` }}>
+                      <Icon name="user" size={17} color={ROLE_COLOR[u.role]} />
+                    </div>
+                    <div style={{ flex: 1, textAlign: 'left' }}>
+                      <div style={{ fontWeight: 600, fontSize: 15 }}>{u.display_name}</div>
+                      <div style={{ fontSize: 12, color: '#78716C', marginTop: 1 }}>{ROLES[u.role]}</div>
+                    </div>
+                    <Icon name="chevR" size={16} color="#C8C4C0" />
+                  </button>
+                ))}
+                {names.length === 0 && <div style={{ padding: '24px 16px', textAlign: 'center', color: '#A8A29E', fontSize: 14 }}>No one in this role yet</div>}
+              </div>
+            </div>}
+            {err && <p style={{ color: '#DC2626', fontSize: 13, marginTop: 14 }}>{err}</p>}
+          </>}
+        </>}
 
-          <option value="">Select your role...</option>
-          <option value="teamleader">Team Leader</option>
-          <option value="trainer">Crew Trainer</option>
-          <option value="manager">Manager</option>
-          <option value="admin">GM / Dept. Manager</option>
-        </select>
-
-        {role &&
-        <div className="fade-in">
-            <p className="label">Select Your Name</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {users.map((u) =>
-            <button key={u.id} onClick={() => onLogin(u)} className="login-row">
-                  <div style={{
-                width: 40, height: 40, borderRadius: 99, flexShrink: 0,
-                background: ROLE_COLOR[u.role] + '1A',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                border: `1.5px solid ${ROLE_COLOR[u.role]}30`
-              }}>
-                    <Icon name="user" size={17} color={ROLE_COLOR[u.role]} />
-                  </div>
-                  <div style={{ flex: 1, textAlign: 'left' }}>
-                    <div style={{ fontWeight: 600, fontSize: 15 }}>{u.name}</div>
-                    <div style={{ fontSize: 12, color: '#78716C', marginTop: 1 }}>{ROLES[u.role]}</div>
-                  </div>
-                  <Icon name="chevR" size={16} color="#C8C4C0" />
-                </button>
-            )}
-            {users.length === 0 &&
-            <div style={{ padding: '24px 16px', textAlign: 'center', color: '#A8A29E', fontSize: 14 }}>No one in this role yet</div>
-            }
+        {pending && <div className="fade-in">
+          <button onClick={() => { setPending(null); setPin(''); setErr(''); }} style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#78716C', marginBottom: 20, fontSize: 14 }}>
+            <Icon name="chevL" size={18} /> Back
+          </button>
+          <div style={{ textAlign: 'center', marginBottom: 8 }}>
+            <div style={{ width: 56, height: 56, borderRadius: 99, background: ROLE_COLOR[pending.role] + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
+              <Icon name="lock" size={22} color={ROLE_COLOR[pending.role]} />
             </div>
+            <div style={{ fontSize: 17, fontWeight: 700 }}>{pending.display_name}</div>
+            <div style={{ fontSize: 13, color: '#78716C', marginTop: 2 }}>Enter your 6-digit PIN</div>
           </div>
-        }
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 12, margin: '22px 0' }}>
+            {[0, 1, 2, 3, 4, 5].map(i => <div key={i} className={'pin-dot' + (i < pin.length ? ' filled' : '')} />)}
+          </div>
+          {err && <p style={{ color: '#DC2626', fontSize: 13, textAlign: 'center', marginBottom: 12 }}>{err}</p>}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, maxWidth: 300, margin: '0 auto' }}>
+            {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map(d => <button key={d} className="key-btn" onClick={() => press(d)}>{d}</button>)}
+            <div />
+            <button className="key-btn" onClick={() => press('0')}>0</button>
+            <button className="key-btn" onClick={() => { setErr(''); setPin(pin.slice(0, -1)); }} style={{ fontSize: 18 }}>⌫</button>
+          </div>
+          {busy && <p style={{ textAlign: 'center', color: '#78716C', fontSize: 13, marginTop: 16 }}>Signing in…</p>}
+        </div>}
       </div>
-    </div>);
-
+    </div>
+  );
 }
 
-// ─── Top Bar ──────────────────────────────────────────────────────────────────
 function TopBar({ user, onLogout }) {
   return (
     <div className="top-bar">
@@ -1086,751 +378,382 @@ function TopBar({ user, onLogout }) {
         <div>
           <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em' }}>SOC Checker</div>
           <div style={{ fontSize: 12, color: '#78716C', display: 'flex', gap: 4, alignItems: 'center' }}>
-            <span style={{ color: ROLE_COLOR[user.role], fontWeight: 500 }}>{ROLES[user.role]}</span>
-            <span>·</span>
+            <span style={{ color: ROLE_COLOR[user.role], fontWeight: 500 }}>{ROLES[user.role]}</span><span>·</span>
             <span>{user.outlet !== 'All' ? user.outlet : 'All Outlets'}</span>
           </div>
         </div>
       </div>
-      <div style={{ display: 'flex', gap: 4 }}>
-        <button onClick={onLogout} style={{ padding: 8, borderRadius: 8, color: '#78716C' }}>
-          <Icon name="logout" size={20} />
-        </button>
-      </div>
-    </div>);
-
+      <button onClick={onLogout} style={{ padding: 8, borderRadius: 8, color: '#78716C' }}><Icon name="logout" size={20} /></button>
+    </div>
+  );
 }
 
-// ─── Bottom Nav ───────────────────────────────────────────────────────────────
 function BottomNav({ tab, setTab, role }) {
   const tabs = [
-  { id: 'dashboard', icon: 'home', label: 'Home' },
-  { id: 'new', icon: 'plus', label: 'New Check' },
-  { id: 'history', icon: 'list', label: 'History' },
-  ...(role === 'manager' || role === 'admin' ? [{ id: 'reports', icon: 'chart', label: 'Reports' }] : []),
-  ...(role === 'admin' ? [{ id: 'templates', icon: 'folder', label: 'Library' }] : [])];
-
+    { id: 'dashboard', icon: 'home', label: 'Home' },
+    { id: 'new', icon: 'plus', label: 'New Check' },
+    { id: 'history', icon: 'list', label: 'History' },
+    ...(role === 'manager' || role === 'admin' ? [{ id: 'reports', icon: 'chart', label: 'Reports' }] : []),
+    ...(role === 'admin' ? [{ id: 'templates', icon: 'folder', label: 'Library' }] : []),
+  ];
   return (
     <div className="bottom-nav">
-      {tabs.map((t) =>
-      <button key={t.id} className={'nav-item' + (tab === t.id ? ' active' : '')} onClick={() => setTab(t.id)}>
-          <div style={{ position: 'relative' }}>
-            <Icon name={t.icon} size={22} sw={tab === t.id ? 2.2 : 1.7} />
-            {t.badge > 0 && <span className="notif-badge">{t.badge > 9 ? '9+' : t.badge}</span>}
-          </div>
+      {tabs.map(t => (
+        <button key={t.id} className={'nav-item' + (tab === t.id ? ' active' : '')} onClick={() => setTab(t.id)}>
+          <div style={{ position: 'relative' }}><Icon name={t.icon} size={22} sw={tab === t.id ? 2.2 : 1.7} /></div>
           <span>{t.label}</span>
         </button>
-      )}
-    </div>);
-
+      ))}
+    </div>
+  );
 }
 
-// ─── Dashboard ────────────────────────────────────────────────────────────────
 function DashboardScreen({ data, user, onNewCheck, onViewCheck }) {
-  const today = new Date().toISOString().split('T')[0];
-
-  const myChecks = useMemo(() => {
-    return data.checks.
-    filter((c) => user.role === 'admin' || user.outlet === 'All' || c.outlet === user.outlet).
-    sort((a, b) => b.date.localeCompare(a.date));
-  }, [data.checks, user]);
-
-  const todayChecks = myChecks.filter((c) => c.date === today);
-  const failAlerts = myChecks.filter((c) => c.hasFail).slice(0, 3);
+  const today = todayStr();
+  const myChecks = useMemo(() => data.checks.slice().sort((a, b) => b.date.localeCompare(a.date)), [data.checks]);
+  const todayChecks = myChecks.filter(c => c.date === today);
+  const failAlerts = myChecks.filter(c => c.hasFail).slice(0, 3);
   const avgScore = myChecks.length ? Math.round(myChecks.reduce((s, c) => s + c.score, 0) / myChecks.length) : 0;
-  const failCount = myChecks.filter((c) => c.hasFail).length;
-
+  const failCount = myChecks.filter(c => c.hasFail).length;
   const hour = new Date().getHours();
   const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-
   return (
     <div className="screen fade-in">
       <div style={{ marginBottom: 20 }}>
         <h2 style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em' }}>{greet}, {user.name.split(' ')[0]}</h2>
         <p style={{ fontSize: 13, color: '#78716C', marginTop: 2 }}>{fmtDate(today)}</p>
       </div>
-
-      {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 16 }}>
-        {[
-        { label: 'Today', value: todayChecks.length, sub: 'checks' },
-        { label: 'Avg Score', value: avgScore + '%', sub: 'overall', color: scoreStyle(avgScore).color },
-        { label: 'Fails', value: failCount, sub: 'total', color: failCount > 0 ? '#DC2626' : undefined }].
-        map((s, i) =>
-        <div key={i} className="card" style={{ textAlign: 'center', padding: '14px 6px' }}>
+        {[{ label: 'Today', value: todayChecks.length },
+          { label: 'Avg Score', value: avgScore + '%', color: scoreStyle(avgScore).color },
+          { label: 'Fails', value: failCount, color: failCount > 0 ? '#DC2626' : undefined }].map((s, i) => (
+          <div key={i} className="card" style={{ textAlign: 'center', padding: '14px 6px' }}>
             <div style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.1, color: s.color || '#1C1917' }}>{s.value}</div>
             <div style={{ fontSize: 11, color: '#78716C', marginTop: 3 }}>{s.label}</div>
           </div>
-        )}
+        ))}
       </div>
-
-      {/* Fail alerts for managers */}
-      {(user.role === 'manager' || user.role === 'admin') && failAlerts.length > 0 &&
-      <div style={{ marginBottom: 16 }}>
+      {(user.role === 'manager' || user.role === 'admin') && failAlerts.length > 0 && (
+        <div style={{ marginBottom: 16 }}>
           <p className="label">Recent Fails</p>
-          {failAlerts.map((c) =>
-        <button key={c.id} onClick={() => onViewCheck(c)} style={{
-          display: 'flex', alignItems: 'center', gap: 10, width: '100%',
-          padding: '11px 14px', borderRadius: 12, marginBottom: 6, textAlign: 'left',
-          background: '#FEF2F2', border: '1px solid #FECACA'
-        }}>
+          {failAlerts.map(c => (
+            <button key={c.id} onClick={() => onViewCheck(c)} style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '11px 14px', borderRadius: 12, marginBottom: 6, textAlign: 'left', background: '#FEF2F2', border: '1px solid #FECACA' }}>
               <Icon name="alert" size={17} color="#DC2626" />
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 500, color: '#1C1917' }}>{c.traineeName} — {c.department}</div>
+                <div style={{ fontSize: 14, fontWeight: 500, color: '#1C1917' }}>{c.traineeName}{c.department ? ' — ' + c.department : ''}</div>
                 <div style={{ fontSize: 12, color: '#78716C' }}>{fmtDate(c.date)} · {c.outlet}</div>
               </div>
               <ScorePill score={c.score} />
             </button>
-        )}
+          ))}
         </div>
-      }
-
-      <button className="btn-primary" onClick={onNewCheck} style={{ marginBottom: 20 }}>
-        + Start New SOC Check
-      </button>
-
+      )}
+      <button className="btn-primary" onClick={onNewCheck} style={{ marginBottom: 20 }}>+ Start New SOC Check</button>
       <p className="label">Recent Checks</p>
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-        {myChecks.slice(0, 10).map((c, i) =>
-        <button key={c.id} onClick={() => onViewCheck(c)} style={{
-          display: 'flex', alignItems: 'center', gap: 12, width: '100%',
-          padding: '11px 16px', textAlign: 'left', background: 'transparent',
-          borderBottom: i < Math.min(myChecks.length - 1, 9) ? '1px solid #F5F4F1' : 'none'
-        }}>
+        {myChecks.slice(0, 10).map((c, i) => (
+          <button key={c.id} onClick={() => onViewCheck(c)} style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '11px 16px', textAlign: 'left', background: 'transparent', borderBottom: i < Math.min(myChecks.length - 1, 9) ? '1px solid #F5F4F1' : 'none' }}>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 14, fontWeight: 500 }}>{c.traineeName}</div>
               <div style={{ fontSize: 12, color: '#78716C' }}>{c.templateName} · {fmtDate(c.date)}</div>
             </div>
-            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-              {c.hasFail && <Icon name="alert" size={14} color="#DC2626" />}
-              <ScorePill score={c.score} />
-            </div>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>{c.hasFail && <Icon name="alert" size={14} color="#DC2626" />}<ScorePill score={c.score} /></div>
           </button>
-        )}
-        {myChecks.length === 0 &&
-        <div style={{ padding: '36px 16px', textAlign: 'center', color: '#A8A29E', fontSize: 14 }}>No checks yet</div>
-        }
+        ))}
+        {myChecks.length === 0 && <div style={{ padding: '36px 16px', textAlign: 'center', color: '#A8A29E', fontSize: 14 }}>No checks yet</div>}
       </div>
-    </div>);
-
+    </div>
+  );
 }
 
-// ─── Check Detail Modal ────────────────────────────────────────────────────────
 function CheckDetailModal({ check, data, onClose }) {
-  const tpl = data.templates.find((t) => t.id === check.templateId);
+  const tpl = data.templates.find(t => t.id === check.templateId);
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 100, display: 'flex', alignItems: 'flex-end' }} onClick={onClose}>
-      <div onClick={(e) => e.stopPropagation()} style={{
-        background: '#fff', borderRadius: '20px 20px 0 0', width: '100%', maxWidth: 480,
-        maxHeight: '88vh', overflow: 'auto', padding: '20px 20px 32px'
-      }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: '20px 20px 0 0', width: '100%', maxWidth: 480, maxHeight: '88vh', overflow: 'auto', padding: '20px 20px 32px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
           <div>
             <h3 style={{ fontSize: 16, fontWeight: 700 }}>{check.templateName}</h3>
             <p style={{ fontSize: 13, color: '#78716C' }}>{check.outlet} · {fmtDate(check.date)}</p>
           </div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <ScorePill score={check.score} />
-            <button onClick={onClose} style={{ padding: 4, color: '#78716C' }}><Icon name="x" size={20} /></button>
-          </div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}><ScorePill score={check.score} /><button onClick={onClose} style={{ padding: 4, color: '#78716C' }}><Icon name="x" size={20} /></button></div>
         </div>
-
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
-          {[['Trainee', check.traineeName], ['Trainer', check.trainerName]].map(([l, v]) =>
-          <div key={l} style={{ background: '#F9F8F6', borderRadius: 10, padding: '9px 12px' }}>
+          {[['Trainee', check.traineeName], ['Trainer', check.trainerName]].map(([l, v]) => (
+            <div key={l} style={{ background: '#F9F8F6', borderRadius: 10, padding: '9px 12px' }}>
               <div style={{ fontSize: 11, color: '#78716C', marginBottom: 2 }}>{l}</div>
               <div style={{ fontSize: 13, fontWeight: 500 }}>{v}</div>
             </div>
-          )}
+          ))}
         </div>
-
-        {check.comment &&
-        <div style={{ padding: '12px 14px', background: '#F9F8F6', borderRadius: 10, marginBottom: 14, border: '1px solid #EEEDEB' }}>
+        {check.comment && (
+          <div style={{ padding: '12px 14px', background: '#F9F8F6', borderRadius: 10, marginBottom: 14, border: '1px solid #EEEDEB' }}>
             <div style={{ fontSize: 11, color: '#A8A29E', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 4 }}>Comments</div>
             <p style={{ fontSize: 13, color: '#44403C', lineHeight: 1.55 }}>{check.comment}</p>
           </div>
-        }
-
-        {tpl && tpl.sections.map((sec) =>
-        <div key={sec.id} style={{ marginBottom: 12 }}>
-            {tpl.sections.length > 1 &&
-          <p className="label">{sec.name} <span style={{ fontWeight: 400, color: '#B5B0AB' }}>weight {sec.weight}</span></p>
-          }
-            {sec.items.map((item) => {
-            const r = check.itemRatings[item.id];
-            const rColor = r === 'pass' ? '#059669' : '#DC2626';
-            const rBg = r === 'pass' ? '#DCFCE7' : '#FEE2E2';
-            const rIcon = r === 'pass' ? 'check' : 'x';
-            return (
-              <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid #F5F4F1' }}>
+        )}
+        {tpl && tpl.sections.map(sec => (
+          <div key={sec.id} style={{ marginBottom: 12 }}>
+            {tpl.sections.length > 1 && <p className="label">{sec.name} <span style={{ fontWeight: 400, color: '#B5B0AB' }}>weight {sec.weight}</span></p>}
+            {sec.items.map(item => {
+              const r = check.itemRatings[item.id];
+              const rColor = r === 'pass' ? '#059669' : '#DC2626';
+              const rBg = r === 'pass' ? '#DCFCE7' : '#FEE2E2';
+              return (
+                <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid #F5F4F1' }}>
                   <div style={{ width: 26, height: 26, borderRadius: 99, background: r ? rBg : '#F5F4F1', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {r ? <Icon name={rIcon} size={14} color={rColor} sw={2.5} /> : <span style={{ color: '#C8C4C0', fontSize: 12 }}>—</span>}
+                    {r ? <Icon name={r === 'pass' ? 'check' : 'x'} size={14} color={rColor} sw={2.5} /> : <span style={{ color: '#C8C4C0', fontSize: 12 }}>—</span>}
                   </div>
                   <span style={{ fontSize: 13, lineHeight: 1.5 }}>{item.text}</span>
-                </div>);
-
-          })}
+                </div>
+              );
+            })}
           </div>
-        )}
+        ))}
       </div>
-    </div>);
-
+    </div>
+  );
 }
 
-// ─── New Check Wizard ─────────────────────────────────────────────────────────
 function NewCheckScreen({ data, user, onSave, onBack }) {
   const TOTAL = 5;
   const [step, setStep] = useState(1);
-  const [form, setForm] = useState({
-    outlet: user.outlet !== 'All' ? user.outlet : 'Brock',
-    department: '',
-    date: todayStr(),
-    traineeName: '',
-    trainerId: user.id,
-    managerId: user.role === 'manager' ? user.id : '',
-    templateId: '',
-    itemRatings: {},
-    uploadedTpl: null,
-    comment: ''
-  });
-  const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
-  const fileRef = useRef();
-
-  const currentTpl = form.uploadedTpl || data.templates.find((t) => t.id === form.templateId);
-
-  const allRated = currentTpl && currentTpl.sections.every((s) => s.items.every((i) => form.itemRatings[i.id]));
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({ outlet: user.outlet !== 'All' ? user.outlet : 'Brock', date: todayStr(), traineeName: '', trainerId: user.id, templateId: '', itemRatings: {}, comment: '' });
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const currentTpl = data.templates.find(t => t.id === form.templateId);
+  const allRated = currentTpl && currentTpl.sections.every(s => s.items.every(i => form.itemRatings[i.id]));
   const score = currentTpl ? calculateScore(currentTpl, form.itemRatings) : 0;
+  const canNext = [() => !!form.outlet, () => form.traineeName && form.date, () => !!currentTpl, () => allRated, () => true][step - 1];
+  const OUTLETS = ['Brock'];
 
-  const canNext = [
-  () => !!form.outlet,
-  () => form.traineeName && form.trainerId && form.date,
-  () => !!currentTpl,
-  () => allRated,
-  () => true][
-  step - 1];
-
-  async function handleFileUpload(file) {
-    if (!file) return;
-    const ext = file.name.split('.').pop().toLowerCase();
-    if (ext === 'csv' || ext === 'txt') {
-      const text = await file.text();
-      const lines = text.split('\n').map((l) => l.trim()).filter((l) => l.length > 3);
-      const tpl = { id: 'custom_' + Date.now(), name: file.name.replace(/\.[^.]+$/, ''), department: form.department, sections: [{ id: 'cs1', name: 'Checklist', weight: 1, items: lines.map((l, i) => ({ id: 'ci_' + i, text: l })) }] };
-      set('uploadedTpl', tpl);set('templateId', tpl.id);set('itemRatings', {});
-    } else if (ext === 'docx') {
-      if (!window.JSZip) {
-        await new Promise((res, rej) => {
-          const s = document.createElement('script');
-          s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
-          s.onload = res;s.onerror = rej;document.head.appendChild(s);
-        });
-      }
-      const ab = await file.arrayBuffer();
-      const zip = new window.JSZip();
-      await zip.loadAsync(ab);
-      const xml = await zip.file('word/document.xml').async('string');
-      const lines = xml.replace(/<[^>]+>/g, '\n').split('\n').map((l) => l.trim()).filter((l) => l.length > 5 && !/^[A-Z0-9_:]+$/.test(l));
-      const tpl = { id: 'custom_' + Date.now(), name: file.name.replace('.docx', ''), department: form.department, sections: [{ id: 'cs1', name: 'Checklist', weight: 1, items: lines.map((l, i) => ({ id: 'ci_' + i, text: l })) }] };
-      set('uploadedTpl', tpl);set('templateId', tpl.id);set('itemRatings', {});
-    } else {
-      alert('Supported formats: .docx, .csv, .txt');
-    }
+  async function handleSubmit() {
+    if (saving) return;
+    setSaving(true);
+    const check = { id: 'tmp', date: form.date, outlet: form.outlet, traineeName: form.traineeName, trainerId: form.trainerId,
+      trainerName: user.name, templateId: currentTpl.id, templateName: currentTpl.name, itemRatings: form.itemRatings, score,
+      comment: form.comment || '', department: currentTpl.department || '', hasFail: Object.values(form.itemRatings).includes('fail') };
+    try { await onSave(check); } catch (e) { setSaving(false); }
   }
 
-  function handleSubmit() {
-    const trainer = data.users.find((u) => u.id === form.trainerId);
-    const manager = data.users.find((u) => u.id === form.managerId);
-    const check = {
-      id: 'c_' + Date.now(), date: form.date, outlet: form.outlet,
-      traineeName: form.traineeName, trainerId: form.trainerId, trainerName: trainer?.name || '—',
-      managerId: form.managerId, managerName: manager?.name || '—',
-      templateId: currentTpl.id, templateName: currentTpl.name,
-      itemRatings: form.itemRatings, score,
-      comment: form.comment || '',
-      department: currentTpl.department || '',
-      hasFail: Object.values(form.itemRatings).includes('fail')
-    };
-    const newData = { ...data, checks: [check, ...data.checks] };
-    onSave(newData, check);
-  }
-
-  const StepHead = ({ title, sub }) =>
-  <div style={{ marginBottom: 20 }}>
+  const StepHead = ({ title, sub }) => (
+    <div style={{ marginBottom: 20 }}>
       <div style={{ background: '#EDEDEB', borderRadius: 99, height: 3, marginBottom: 10, overflow: 'hidden' }}>
         <div style={{ height: '100%', background: '#1C1917', borderRadius: 99, width: `${step / TOTAL * 100}%`, transition: 'width 0.3s ease' }} />
       </div>
       <div style={{ fontSize: 11, color: '#A8A29E', marginBottom: 4 }}>Step {step} of {TOTAL}</div>
       <h2 style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em' }}>{title}</h2>
       {sub && <p style={{ fontSize: 13, color: '#78716C', marginTop: 3 }}>{sub}</p>}
-    </div>;
-
+    </div>
+  );
 
   return (
     <div className="screen fade-in">
-      <button onClick={step > 1 ? () => setStep((s) => s - 1) : onBack} style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#78716C', marginBottom: 16, fontSize: 14 }}>
+      <button onClick={step > 1 ? () => setStep(s => s - 1) : onBack} style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#78716C', marginBottom: 16, fontSize: 14 }}>
         <Icon name="chevL" size={18} /> {step > 1 ? 'Back' : 'Cancel'}
       </button>
 
-      {/* Step 1 — Outlet */}
-      {step === 1 &&
-      <div className="fade-in">
-          <StepHead title="Select Outlet" sub="Confirm your outlet to continue" />
-          <p className="label">Outlet</p>
-          <div style={{ display: 'flex', gap: 8 }}>
-            {OUTLETS.map((o) =>
-          <button key={o} onClick={() => set('outlet', o)} className={'picker-btn' + (form.outlet === o ? ' active' : '')} style={{ flex: 1 }}>{o}</button>
-          )}
+      {step === 1 && <div className="fade-in">
+        <StepHead title="Select Outlet" sub="Confirm your outlet to continue" />
+        <p className="label">Outlet</p>
+        <div style={{ display: 'flex', gap: 8 }}>{OUTLETS.map(o => <button key={o} onClick={() => set('outlet', o)} className={'picker-btn' + (form.outlet === o ? ' active' : '')} style={{ flex: 1 }}>{o}</button>)}</div>
+      </div>}
+
+      {step === 2 && <div className="fade-in">
+        <StepHead title="Employee Details" sub="Who is being assessed?" />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div><p className="label">Date</p><input type="date" className="soc-input" value={form.date} onChange={e => set('date', e.target.value)} /></div>
+          <div><p className="label">Trainee / Employee Name</p><input className="soc-input" placeholder="Enter full name" value={form.traineeName} onChange={e => set('traineeName', e.target.value)} /></div>
+          <div style={{ padding: '11px 14px', borderRadius: 12, background: '#F9F8F6', border: '1.5px solid #EEEDEB', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 34, height: 34, borderRadius: 99, background: ROLE_COLOR[user.role] + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Icon name="user" size={16} color={ROLE_COLOR[user.role]} /></div>
+            <div><div style={{ fontSize: 11, color: '#A8A29E', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Conducted by</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#1C1917' }}>{user.name} <span style={{ fontWeight: 400, color: '#78716C' }}>· {ROLES[user.role]}</span></div></div>
           </div>
         </div>
-      }
+      </div>}
 
-      {/* Step 2 — Employee Details */}
-      {step === 2 &&
-      <div className="fade-in">
-          <StepHead title="Employee Details" sub="Who is being assessed?" />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div>
-              <p className="label">Date</p>
-              <input type="date" className="soc-input" value={form.date} onChange={(e) => set('date', e.target.value)} />
-            </div>
-            <div>
-              <p className="label">Trainee / Employee Name</p>
-              <input className="soc-input" placeholder="Enter full name" value={form.traineeName} onChange={(e) => set('traineeName', e.target.value)} />
-            </div>
-            <div style={{ padding: '11px 14px', borderRadius: 12, background: '#F9F8F6', border: '1.5px solid #EEEDEB', display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 34, height: 34, borderRadius: 99, background: ROLE_COLOR[user.role] + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <Icon name="user" size={16} color={ROLE_COLOR[user.role]} />
+      {step === 3 && <div className="fade-in">
+        <StepHead title="SOC Template" sub="Choose the template to use" />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
+          {data.templates.map(t => (
+            <button key={t.id} onClick={() => { set('templateId', t.id); set('itemRatings', {}); }} className={'tpl-btn' + (form.templateId === t.id ? ' active' : '')}>
+              <div style={{ flex: 1, textAlign: 'left' }}>
+                <div style={{ fontWeight: 500, fontSize: 14 }}>{t.name}</div>
+                <div style={{ fontSize: 12, opacity: 0.6, marginTop: 2 }}>{t.sections.reduce((n, s) => n + s.items.length, 0)} items</div>
               </div>
-              <div>
-                <div style={{ fontSize: 11, color: '#A8A29E', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Conducted by</div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: '#1C1917' }}>{user.name} <span style={{ fontWeight: 400, color: '#78716C' }}>· {ROLES[user.role]}</span></div>
-              </div>
-            </div>
-
-          </div>
+              {form.templateId === t.id && <Icon name="check" size={18} color="#fff" sw={2.5} />}
+            </button>
+          ))}
+          {data.templates.length === 0 && <div style={{ padding: '24px 16px', textAlign: 'center', color: '#A8A29E', fontSize: 14 }}>No templates yet — ask your GM to upload some via the Library tab</div>}
         </div>
-      }
+      </div>}
 
-      {/* Step 3 — Template */}
-      {step === 3 &&
-      <div className="fade-in">
-          <StepHead title="SOC Template" sub="Choose the template to use" />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
-            {data.templates.map((t) =>
-          <button key={t.id} onClick={() => {set('templateId', t.id);set('uploadedTpl', null);set('itemRatings', {});}}
-          className={'tpl-btn' + (form.templateId === t.id && !form.uploadedTpl ? ' active' : '')}>
-                <div style={{ flex: 1, textAlign: 'left' }}>
-                  <div style={{ fontWeight: 500, fontSize: 14 }}>{t.name}</div>
-                  <div style={{ fontSize: 12, opacity: 0.6, marginTop: 2 }}>
-                    {t.sections.reduce((n, s) => n + s.items.length, 0)} items
+      {step === 4 && currentTpl && <div className="fade-in">
+        <StepHead title={currentTpl.name} sub={`Rating for ${form.traineeName}`} />
+        {currentTpl.sections.map(sec => (
+          <div key={sec.id} style={{ marginBottom: 14 }}>
+            {currentTpl.sections.length > 1 && <p className="label">{sec.name} <span style={{ fontWeight: 400, color: '#B5B0AB' }}>· weight {sec.weight}</span></p>}
+            <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+              {sec.items.map((item, idx) => (
+                <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: idx < sec.items.length - 1 ? '1px solid #F5F4F1' : 'none' }}>
+                  <p style={{ fontSize: 14, lineHeight: 1.45, flex: 1 }}>{item.text}</p>
+                  <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                    {[{ r: 'pass', icon: 'check', active: '#059669', activeBg: '#DCFCE7' }, { r: 'fail', icon: 'x', active: '#DC2626', activeBg: '#FEE2E2' }].map(({ r, icon, active, activeBg }) => {
+                      const on = form.itemRatings[item.id] === r;
+                      return <button key={r} onClick={() => set('itemRatings', { ...form.itemRatings, [item.id]: r })} style={{ width: 40, height: 40, borderRadius: 99, flexShrink: 0, border: `1.5px solid ${on ? active : '#E7E5E4'}`, background: on ? activeBg : '#F9F8F6', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.1s' }}><Icon name={icon} size={18} color={on ? active : '#C8C4C0'} sw={on ? 2.8 : 1.8} /></button>;
+                    })}
                   </div>
                 </div>
-                {form.templateId === t.id && !form.uploadedTpl && <Icon name="check" size={18} color="#fff" sw={2.5} />}
-              </button>
-          )}
-            {data.templates.length === 0 &&
-          <div style={{ padding: '24px 16px', textAlign: 'center', color: '#A8A29E', fontSize: 14 }}>No templates yet — ask your GM to upload some via the Library tab</div>
-          }
-          </div>
-
-        {user.role === 'admin' &&
-        <>
-          <p className="label">Upload Custom Template</p>
-          <div className="card" style={{ border: '1.5px dashed #DDDBD8' }}>
-            <p style={{ fontSize: 13, color: '#78716C', marginBottom: 12 }}>Supports .docx, .csv, .txt</p>
-            {form.uploadedTpl ?
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: '#F0FDF4', borderRadius: 10, border: '1px solid #BBF7D0' }}>
-                <Icon name="check" size={16} color="#059669" sw={2.5} />
-                <span style={{ fontSize: 13, color: '#059669', fontWeight: 500, flex: 1 }}>{form.uploadedTpl.name}</span>
-                <span style={{ fontSize: 12, color: '#78716C' }}>{form.uploadedTpl.sections[0]?.items.length} items</span>
-                <button onClick={() => {set('uploadedTpl', null);set('templateId', '');}} style={{ color: '#78716C', padding: 4 }}><Icon name="x" size={15} /></button>
-              </div> :
-
-            <button onClick={() => fileRef.current?.click()} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                <Icon name="upload" size={16} /> Choose File
-              </button>
-            }
-            <input ref={fileRef} type="file" accept=".docx,.xlsx,.xls,.csv,.txt,.doc" style={{ display: 'none' }} onChange={(e) => handleFileUpload(e.target.files[0])} />
-          </div>
-          </>
-        }
-        </div>
-      }
-
-      {/* Step 4 — Checklist */}
-      {step === 4 && currentTpl &&
-      <div className="fade-in">
-          <StepHead title={currentTpl.name} sub={`Rating for ${form.traineeName}`} />
-          {currentTpl.sections.map((sec) =>
-        <div key={sec.id} style={{ marginBottom: 14 }}>
-              {currentTpl.sections.length > 1 &&
-          <p className="label">{sec.name} <span style={{ fontWeight: 400, color: '#B5B0AB' }}>· weight {sec.weight}</span></p>
-          }
-              <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-                {sec.items.map((item, idx) =>
-            <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: idx < sec.items.length - 1 ? '1px solid #F5F4F1' : 'none' }}>
-                    <p style={{ fontSize: 14, lineHeight: 1.45, flex: 1 }}>{item.text}</p>
-                    <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-                      {[
-                { r: 'pass', icon: 'check', active: '#059669', activeBg: '#DCFCE7' },
-                { r: 'fail', icon: 'x', active: '#DC2626', activeBg: '#FEE2E2' }].
-                map(({ r, icon, active, activeBg }) => {
-                  const on = form.itemRatings[item.id] === r;
-                  return (
-                    <button key={r}
-                    onClick={() => set('itemRatings', { ...form.itemRatings, [item.id]: r })}
-                    style={{
-                      width: 40, height: 40, borderRadius: 99, flexShrink: 0,
-                      border: `1.5px solid ${on ? active : '#E7E5E4'}`,
-                      background: on ? activeBg : '#F9F8F6',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      transition: 'all 0.1s'
-                    }}>
-                            <Icon name={icon} size={18} color={on ? active : '#C8C4C0'} sw={on ? 2.8 : 1.8} />
-                          </button>);
-
-                })}
-                    </div>
-                  </div>
-            )}
-              </div>
-            </div>
-        )}
-
-          <div style={{ marginTop: 20 }}>
-            <p className="label" style={{ marginBottom: 6 }}>Comments / Feedback <span style={{ fontWeight: 400, color: '#B5B0AB', textTransform: 'none', letterSpacing: 0 }}>— optional</span></p>
-            <textarea
-            className="soc-input"
-            rows={3}
-            placeholder="Add any notes or observations..."
-            value={form.comment}
-            onChange={(e) => set('comment', e.target.value)}
-            style={{ resize: 'vertical', lineHeight: 1.5 }} />
-
-          </div>
-
-          {allRated &&
-        <div style={{ padding: '14px 18px', borderRadius: 14, background: scoreStyle(score).bg, border: `1px solid ${scoreStyle(score).color}30`, marginTop: 12 }}>
-              <div style={{ fontSize: 12, color: '#78716C' }}>Current Score</div>
-              <div style={{ fontSize: 32, fontWeight: 700, color: scoreStyle(score).color, letterSpacing: '-0.03em' }}>{score}%</div>
-            </div>
-        }
-        </div>
-      }
-
-      {/* Step 5 — Summary */}
-      {step === 5 &&
-      <div className="fade-in">
-          <StepHead title="Review & Submit" sub="Check everything before submitting" />
-          <div className="card" style={{ marginBottom: 12 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid #F5F4F1' }}>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: 15 }}>{currentTpl?.name}</div>
-                <div style={{ fontSize: 13, color: '#78716C', marginTop: 2 }}>{form.outlet}</div>
-              </div>
-              <div style={{ fontSize: 32, fontWeight: 700, color: scoreStyle(score).color, letterSpacing: '-0.03em', lineHeight: 1 }}>{score}%</div>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-              {[
-            ['Trainee', form.traineeName],
-            ['Date', fmtDate(form.date)],
-            ['Trainer', data.users.find((u) => u.id === form.trainerId)?.name || '—']].
-            map(([l, v]) =>
-            <div key={l} style={{ background: '#F9F8F6', borderRadius: 10, padding: '10px 12px' }}>
-                  <div style={{ fontSize: 11, color: '#78716C' }}>{l}</div>
-                  <div style={{ fontSize: 13, fontWeight: 500, marginTop: 1 }}>{v}</div>
-                </div>
-            )}
+              ))}
             </div>
           </div>
-
-          <button className="btn-primary" onClick={handleSubmit}>Submit SOC Check</button>
+        ))}
+        <div style={{ marginTop: 20 }}>
+          <p className="label" style={{ marginBottom: 6 }}>Comments / Feedback <span style={{ fontWeight: 400, color: '#B5B0AB', textTransform: 'none', letterSpacing: 0 }}>— optional</span></p>
+          <textarea className="soc-input" rows={3} placeholder="Add any notes or observations..." value={form.comment} onChange={e => set('comment', e.target.value)} style={{ resize: 'vertical', lineHeight: 1.5 }} />
         </div>
-      }
+        {allRated && <div style={{ padding: '14px 18px', borderRadius: 14, background: scoreStyle(score).bg, border: `1px solid ${scoreStyle(score).color}30`, marginTop: 12 }}>
+          <div style={{ fontSize: 12, color: '#78716C' }}>Current Score</div>
+          <div style={{ fontSize: 32, fontWeight: 700, color: scoreStyle(score).color, letterSpacing: '-0.03em' }}>{score}%</div>
+        </div>}
+      </div>}
 
-      {/* Continue button */}
-      {step < 5 &&
-      <div style={{ marginTop: 24 }}>
-          <button className="btn-primary" onClick={() => setStep((s) => s + 1)} disabled={!canNext()} style={{ opacity: canNext() ? 1 : 0.35 }}>
-            Continue
-          </button>
+      {step === 5 && <div className="fade-in">
+        <StepHead title="Review & Submit" sub="Check everything before submitting" />
+        <div className="card" style={{ marginBottom: 12 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid #F5F4F1' }}>
+            <div><div style={{ fontWeight: 700, fontSize: 15 }}>{currentTpl?.name}</div><div style={{ fontSize: 13, color: '#78716C', marginTop: 2 }}>{form.outlet}</div></div>
+            <div style={{ fontSize: 32, fontWeight: 700, color: scoreStyle(score).color, letterSpacing: '-0.03em', lineHeight: 1 }}>{score}%</div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            {[['Trainee', form.traineeName], ['Date', fmtDate(form.date)], ['Trainer', user.name]].map(([l, v]) => (
+              <div key={l} style={{ background: '#F9F8F6', borderRadius: 10, padding: '10px 12px' }}><div style={{ fontSize: 11, color: '#78716C' }}>{l}</div><div style={{ fontSize: 13, fontWeight: 500, marginTop: 1 }}>{v}</div></div>
+            ))}
+          </div>
         </div>
-      }
-    </div>);
+        <button className="btn-primary" onClick={handleSubmit} disabled={saving} style={{ opacity: saving ? 0.6 : 1 }}>{saving ? 'Submitting…' : 'Submit SOC Check'}</button>
+      </div>}
 
+      {step < 5 && <div style={{ marginTop: 24 }}><button className="btn-primary" onClick={() => setStep(s => s + 1)} disabled={!canNext()} style={{ opacity: canNext() ? 1 : 0.35 }}>Continue</button></div>}
+    </div>
+  );
 }
 
-// ─── History Screen ────────────────────────────────────────────────────────────
-function HistoryScreen({ data, user, onViewCheck }) {
-  const [fOutlet, setFOutlet] = useState('All');
-
-  const checks = useMemo(() => data.checks.
-  filter((c) => {
-    if (user.role !== 'admin' && user.outlet !== 'All' && c.outlet !== user.outlet) return false;
-    if (fOutlet !== 'All' && c.outlet !== fOutlet) return false;
-    return true;
-  }).
-  sort((a, b) => b.date.localeCompare(a.date)), [data.checks, user, fOutlet]);
-
+function HistoryScreen({ data, onViewCheck }) {
+  const checks = useMemo(() => data.checks.slice().sort((a, b) => b.date.localeCompare(a.date)), [data.checks]);
   return (
     <div className="screen fade-in">
       <h2 style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 14 }}>Check History</h2>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 14, overflowX: 'auto' }}>
-        <select className="soc-input soc-select" style={{ flex: '0 0 auto', width: 'auto', padding: '8px 12px', fontSize: 13 }} value={fOutlet} onChange={(e) => setFOutlet(e.target.value)}>
-          <option value="All">All Outlets</option>
-          {OUTLETS.map((o) => <option key={o} value={o}>{o}</option>)}
-        </select>
-      </div>
       <p style={{ fontSize: 13, color: '#78716C', marginBottom: 10 }}>{checks.length} check{checks.length !== 1 ? 's' : ''}</p>
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-        {checks.map((c, i) =>
-        <button key={c.id} onClick={() => onViewCheck(c)} style={{
-          display: 'flex', alignItems: 'center', gap: 12, width: '100%',
-          padding: '11px 16px', textAlign: 'left', background: 'transparent',
-          borderBottom: i < checks.length - 1 ? '1px solid #F5F4F1' : 'none'
-        }}>
+        {checks.map((c, i) => (
+          <button key={c.id} onClick={() => onViewCheck(c)} style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '11px 16px', textAlign: 'left', background: 'transparent', borderBottom: i < checks.length - 1 ? '1px solid #F5F4F1' : 'none' }}>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 14, fontWeight: 500 }}>{c.traineeName}</div>
               <div style={{ fontSize: 12, color: '#78716C', marginTop: 1 }}>{c.templateName} · {fmtDate(c.date)}</div>
               <div style={{ fontSize: 11, color: '#A8A29E', marginTop: 1 }}>Trainer: {c.trainerName}</div>
             </div>
-            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-              {c.hasFail && <Icon name="alert" size={14} color="#DC2626" />}
-              <ScorePill score={c.score} />
-            </div>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>{c.hasFail && <Icon name="alert" size={14} color="#DC2626" />}<ScorePill score={c.score} /></div>
           </button>
-        )}
-        {checks.length === 0 &&
-        <div style={{ padding: '40px 16px', textAlign: 'center', color: '#A8A29E', fontSize: 14 }}>No checks match your filters</div>
-        }
+        ))}
+        {checks.length === 0 && <div style={{ padding: '40px 16px', textAlign: 'center', color: '#A8A29E', fontSize: 14 }}>No checks yet</div>}
       </div>
-    </div>);
-
+    </div>
+  );
 }
 
-// ─── Reports Screen ────────────────────────────────────────────────────────────
-function ReportsScreen({ data, user }) {
+function ReportsScreen({ data }) {
   const [period, setPeriod] = useState('month');
   const [rTab, setRTab] = useState('scores');
   const [selectedCrew, setSelectedCrew] = useState(null);
-
   const days = period === 'week' ? 7 : 30;
-  const cutoff = useMemo(() => {const d = new Date('2026-06-19');d.setDate(d.getDate() - days);return d.toISOString().split('T')[0];}, [days]);
-
-  const filtered = useMemo(() =>
-  data.checks.filter((c) => c.date >= cutoff),
-  [data.checks, cutoff]);
+  const cutoff = useMemo(() => { const d = new Date(); d.setDate(d.getDate() - days); return d.toISOString().split('T')[0]; }, [days]);
+  const filtered = useMemo(() => data.checks.filter(c => c.date >= cutoff), [data.checks, cutoff]);
 
   const empSummary = useMemo(() => {
     const map = {};
-    filtered.forEach((c) => {
-      if (!map[c.traineeName]) map[c.traineeName] = { name: c.traineeName, outlet: c.outlet, checks: [] };
-      map[c.traineeName].checks.push(c);
-    });
-    return Object.values(map).map((e) => ({
-      name: e.name, outlet: e.outlet,
-      count: e.checks.length,
-      avg: Math.round(e.checks.reduce((s, c) => s + c.score, 0) / e.checks.length),
-      last: e.checks.sort((a, b) => b.date.localeCompare(a.date))[0]?.date
-    })).sort((a, b) => b.avg - a.avg);
+    filtered.forEach(c => { if (!map[c.traineeName]) map[c.traineeName] = { name: c.traineeName, checks: [] }; map[c.traineeName].checks.push(c); });
+    return Object.values(map).map(e => ({ name: e.name, count: e.checks.length, avg: Math.round(e.checks.reduce((s, c) => s + c.score, 0) / e.checks.length), last: e.checks.slice().sort((a, b) => b.date.localeCompare(a.date))[0]?.date })).sort((a, b) => b.avg - a.avg);
   }, [filtered]);
-
   const trainerActivity = useMemo(() => {
     const map = {};
-    filtered.forEach((c) => {
-      if (!map[c.trainerName]) map[c.trainerName] = { name: c.trainerName, outlet: c.outlet, count: 0, last: '' };
-      map[c.trainerName].count++;
-      if (c.date > map[c.trainerName].last) map[c.trainerName].last = c.date;
-    });
-    return Object.values(map).sort((a, b) => b.count - a.count);
-  }, [filtered]);
-
-  const managerActivity = useMemo(() => {
-    const map = {};
-    filtered.forEach((c) => {
-      if (!map[c.managerName]) map[c.managerName] = { name: c.managerName, outlet: c.outlet, count: 0, last: '' };
-      map[c.managerName].count++;
-      if (c.date > map[c.managerName].last) map[c.managerName].last = c.date;
-    });
+    filtered.forEach(c => { const k = c.trainerName || '—'; if (!map[k]) map[k] = { name: k, count: 0, last: '' }; map[k].count++; if (c.date > map[k].last) map[k].last = c.date; });
     return Object.values(map).sort((a, b) => b.count - a.count);
   }, [filtered]);
 
   function doExport() {
-    const label = `${period}_${new Date().toISOString().split('T')[0]}`;
-    if (rTab === 'scores') {
-      exportCSV(
-        empSummary.map((e) => [e.name, e.count, e.avg + '%', fmtDate(e.last)]),
-        ['Employee', 'Checks', 'Avg Score', 'Last Check'],
-        'SOC_Scores_' + label
-      );
-    } else {
-      exportCSV(
-        [
-        ...trainerActivity.map((t) => ['Trainer', t.name, t.count, Math.min(Math.round(t.count / days * 100), 100) + '%', fmtDate(t.last)]),
-        ...managerActivity.map((m) => ['Manager', m.name, m.count, Math.min(Math.round(m.count / days * 100), 100) + '%', fmtDate(m.last)])],
-
-        ['Role', 'Name', 'Checks', 'Completion Rate', 'Last Active'],
-        'SOC_Activity_' + label
-      );
-    }
+    const label = `${period}_${todayStr()}`;
+    if (rTab === 'activity') exportCSV(trainerActivity.map(t => [t.name, t.count, Math.min(Math.round(t.count / days * 100), 100) + '%', fmtDate(t.last)]), ['Trainer', 'Checks', 'Completion Rate', 'Last Active'], 'SOC_Activity_' + label);
+    else exportCSV(empSummary.map(e => [e.name, e.count, e.avg + '%', fmtDate(e.last)]), ['Employee', 'Checks', 'Avg Score', 'Last Check'], 'SOC_Scores_' + label);
   }
 
   return (
     <div className="screen fade-in">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
         <h2 style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em' }}>Reports</h2>
-        <button onClick={doExport} style={{ display: 'flex', gap: 6, alignItems: 'center', padding: '8px 14px', borderRadius: 10, background: '#F5F4F1', fontSize: 13, fontWeight: 500, border: '1px solid #EDEDEB' }}>
-          <Icon name="download" size={14} /> Export CSV
-        </button>
+        <button onClick={doExport} style={{ display: 'flex', gap: 6, alignItems: 'center', padding: '8px 14px', borderRadius: 10, background: '#F5F4F1', fontSize: 13, fontWeight: 500, border: '1px solid #EDEDEB' }}><Icon name="download" size={14} /> Export CSV</button>
       </div>
-
-      <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
-        <div className="tab-strip" style={{ flex: 1 }}>
-          {['week', 'month'].map((p) =>
-          <button key={p} className={'tab-btn' + (period === p ? ' active' : '')} onClick={() => setPeriod(p)}>
-              {p === 'week' ? 'This Week' : 'This Month'}
-            </button>
-          )}
-        </div>
-      </div>
-
+      <div className="tab-strip" style={{ marginBottom: 12 }}>{['week', 'month'].map(p => <button key={p} className={'tab-btn' + (period === p ? ' active' : '')} onClick={() => setPeriod(p)}>{p === 'week' ? 'This Week' : 'This Month'}</button>)}</div>
       <p style={{ fontSize: 13, color: '#78716C', marginBottom: 12 }}>{filtered.length} checks · last {days} days</p>
+      <div className="tab-strip" style={{ marginBottom: 14 }}>{[['scores', 'Employee Scores'], ['activity', 'Trainers'], ['crew', 'Crew']].map(([id, label]) => <button key={id} className={'tab-btn' + (rTab === id ? ' active' : '')} onClick={() => setRTab(id)}>{label}</button>)}</div>
 
-      <div className="tab-strip" style={{ marginBottom: 14 }}>
-        {[['scores', 'Employee Scores'], ['activity', 'Trainer & Manager'], ['crew', 'Crew']].map(([id, label]) =>
-        <button key={id} className={'tab-btn' + (rTab === id ? ' active' : '')} onClick={() => setRTab(id)}>{label}</button>
-        )}
-      </div>
+      {rTab === 'scores' && <div className="card" style={{ padding: 0, overflow: 'auto' }}>
+        <table className="report-table">
+          <thead><tr><th>Employee</th><th>Checks</th><th>Avg</th><th>Last Check</th></tr></thead>
+          <tbody>
+            {empSummary.map(e => <tr key={e.name}><td style={{ fontWeight: 500 }}>{e.name}</td><td>{e.count}</td><td><ScorePill score={e.avg} /></td><td style={{ color: '#78716C', fontSize: 12 }}>{fmtDate(e.last)}</td></tr>)}
+            {empSummary.length === 0 && <tr><td colSpan={4} style={{ textAlign: 'center', color: '#A8A29E', padding: 32 }}>No data for this period</td></tr>}
+          </tbody>
+        </table>
+      </div>}
 
-      {rTab === 'scores' &&
-      <div className="card" style={{ padding: 0, overflow: 'auto' }}>
-          <table className="report-table">
-            <thead><tr><th>Employee</th><th>Checks</th><th>Avg</th><th>Last Check</th></tr></thead>
-            <tbody>
-              {empSummary.map((e) =>
-            <tr key={e.name}>
-                  <td style={{ fontWeight: 500 }}>{e.name}</td>
-                  <td>{e.count}</td>
-                  <td><ScorePill score={e.avg} /></td>
-                  <td style={{ color: '#78716C', fontSize: 12 }}>{fmtDate(e.last)}</td>
-                </tr>
-            )}
-              {empSummary.length === 0 && <tr><td colSpan={4} style={{ textAlign: 'center', color: '#A8A29E', padding: 32 }}>No data for this period</td></tr>}
-            </tbody>
-          </table>
-        </div>
-      }
-
-      {rTab === 'activity' &&
-      <div>
-          <p className="label" style={{ marginBottom: 8 }}>Crew Trainers</p>
-          <div className="card" style={{ padding: 0, overflow: 'auto', marginBottom: 16 }}>
-            <table className="report-table">
-              <thead><tr><th>Trainer</th><th>Checks</th><th>Rate</th><th>Last Active</th></tr></thead>
-              <tbody>
-                {trainerActivity.map((t) => {
-                const rate = Math.min(Math.round(t.count / days * 100), 100);
-                return (
-                  <tr key={t.name}>
-                      <td style={{ fontWeight: 500 }}>{t.name}</td>
-                      <td>{t.count}</td>
-                      <td><ScorePill score={rate} /></td>
-                      <td style={{ color: '#78716C', fontSize: 12 }}>{fmtDate(t.last)}</td>
-                    </tr>);
-
-              })}
-                {trainerActivity.length === 0 && <tr><td colSpan={4} style={{ textAlign: 'center', color: '#A8A29E', padding: 24 }}>No data</td></tr>}
-              </tbody>
-            </table>
-          </div>
-
-          <p className="label" style={{ marginBottom: 8 }}>Managers</p>
-          <div className="card" style={{ padding: 0, overflow: 'auto' }}>
-            <table className="report-table">
-              <thead><tr><th>Manager</th><th>Supervised</th><th>Rate</th><th>Last Active</th></tr></thead>
-              <tbody>
-                {managerActivity.map((m) => {
-                const rate = Math.min(Math.round(m.count / days * 100), 100);
-                return (
-                  <tr key={m.name}>
-                      <td style={{ fontWeight: 500 }}>{m.name}</td>
-                      <td>{m.count}</td>
-                      <td><ScorePill score={rate} /></td>
-                      <td style={{ color: '#78716C', fontSize: 12 }}>{fmtDate(m.last)}</td>
-                    </tr>);
-
-              })}
-                {managerActivity.length === 0 && <tr><td colSpan={4} style={{ textAlign: 'center', color: '#A8A29E', padding: 24 }}>No data</td></tr>}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      }
+      {rTab === 'activity' && <div className="card" style={{ padding: 0, overflow: 'auto' }}>
+        <table className="report-table">
+          <thead><tr><th>Trainer</th><th>Checks</th><th>Rate</th><th>Last Active</th></tr></thead>
+          <tbody>
+            {trainerActivity.map(t => { const rate = Math.min(Math.round(t.count / days * 100), 100); return <tr key={t.name}><td style={{ fontWeight: 500 }}>{t.name}</td><td>{t.count}</td><td><ScorePill score={rate} /></td><td style={{ color: '#78716C', fontSize: 12 }}>{fmtDate(t.last)}</td></tr>; })}
+            {trainerActivity.length === 0 && <tr><td colSpan={4} style={{ textAlign: 'center', color: '#A8A29E', padding: 24 }}>No data</td></tr>}
+          </tbody>
+        </table>
+      </div>}
 
       {rTab === 'crew' && (() => {
         const crewMap = {};
-        filtered.forEach(c => {
-          if (!crewMap[c.traineeName]) crewMap[c.traineeName] = [];
-          crewMap[c.traineeName].push(c);
-        });
-        const crewList = Object.entries(crewMap)
-          .map(([name, checks]) => ({ name, checks: checks.sort((a,b) => b.date.localeCompare(a.date)), avg: Math.round(checks.reduce((s,c) => s+c.score,0)/checks.length) }))
-          .sort((a,b) => a.name.localeCompare(b.name));
+        filtered.forEach(c => { if (!crewMap[c.traineeName]) crewMap[c.traineeName] = []; crewMap[c.traineeName].push(c); });
+        const crewList = Object.entries(crewMap).map(([name, checks]) => ({ name, checks: checks.slice().sort((a, b) => b.date.localeCompare(a.date)), avg: Math.round(checks.reduce((s, c) => s + c.score, 0) / checks.length) })).sort((a, b) => a.name.localeCompare(b.name));
         return (
           <div className="fade-in">
-            {crewList.length === 0 && <div style={{ textAlign:'center', padding:'40px 16px', color:'#A8A29E', fontSize:14 }}>No checks in this period</div>}
-            <div className="card" style={{ padding:0, overflow:'hidden' }}>
-              {crewList.map((c,i) => (
-                <button key={c.name} onClick={() => setSelectedCrew(c.name)} style={{
-                  display:'flex', alignItems:'center', gap:12, width:'100%', padding:'12px 16px', textAlign:'left', background:'transparent',
-                  borderBottom: i < crewList.length-1 ? '1px solid #F5F4F1' : 'none',
-                }}>
-                  <div style={{ width:36, height:36, borderRadius:99, background:'#F5F4F1', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                    <Icon name="user" size={17} color="#78716C" />
-                  </div>
-                  <div style={{ flex:1 }}>
-                    <div style={{ fontSize:14, fontWeight:600 }}>{c.name}</div>
-                    <div style={{ fontSize:12, color:'#78716C' }}>{c.checks.length} SOC{c.checks.length!==1?'s':''} · Last {fmtDate(c.checks[0].date)}</div>
-                  </div>
-                  <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-                    <ScorePill score={c.avg} />
-                    <Icon name="chevR" size={16} color="#C8C4C0" />
-                  </div>
+            {crewList.length === 0 && <div style={{ textAlign: 'center', padding: '40px 16px', color: '#A8A29E', fontSize: 14 }}>No checks in this period</div>}
+            <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+              {crewList.map((c, i) => (
+                <button key={c.name} onClick={() => setSelectedCrew(c.name)} style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '12px 16px', textAlign: 'left', background: 'transparent', borderBottom: i < crewList.length - 1 ? '1px solid #F5F4F1' : 'none' }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 99, background: '#F5F4F1', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Icon name="user" size={17} color="#78716C" /></div>
+                  <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 600 }}>{c.name}</div><div style={{ fontSize: 12, color: '#78716C' }}>{c.checks.length} SOC{c.checks.length !== 1 ? 's' : ''} · Last {fmtDate(c.checks[0].date)}</div></div>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}><ScorePill score={c.avg} /><Icon name="chevR" size={16} color="#C8C4C0" /></div>
                 </button>
               ))}
             </div>
-
             {selectedCrew && (() => {
-              const crew = crewList.find(c => c.name === selectedCrew);
-              if (!crew) return null;
+              const crew = crewList.find(c => c.name === selectedCrew); if (!crew) return null;
               return (
-                <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:100, display:'flex', alignItems:'flex-end' }}
-                  onClick={() => setSelectedCrew(null)}>
-                  <div onClick={e => e.stopPropagation()} style={{ background:'#F7F6F3', borderRadius:'20px 20px 0 0', width:'100%', maxWidth:480, maxHeight:'88vh', overflow:'auto', display:'flex', flexDirection:'column' }}>
-                    <div style={{ padding:'20px 20px 14px', background:'#fff', borderBottom:'1px solid #EEEDEB', borderRadius:'20px 20px 0 0', flexShrink:0 }}>
-                      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
-                        <div>
-                          <h3 style={{ fontSize:17, fontWeight:700 }}>{crew.name}</h3>
-                          <p style={{ fontSize:13, color:'#78716C', marginTop:2 }}>{crew.checks.length} SOC{crew.checks.length!==1?'s':''} this period</p>
-                        </div>
-                        <button onClick={() => setSelectedCrew(null)} style={{ color:'#78716C', padding:4, background:'none', border:'none', cursor:'pointer' }}><Icon name="x" size={20} /></button>
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 100, display: 'flex', alignItems: 'flex-end' }} onClick={() => setSelectedCrew(null)}>
+                  <div onClick={e => e.stopPropagation()} style={{ background: '#F7F6F3', borderRadius: '20px 20px 0 0', width: '100%', maxWidth: 480, maxHeight: '88vh', overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ padding: '20px 20px 14px', background: '#fff', borderBottom: '1px solid #EEEDEB', borderRadius: '20px 20px 0 0', flexShrink: 0 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div><h3 style={{ fontSize: 17, fontWeight: 700 }}>{crew.name}</h3><p style={{ fontSize: 13, color: '#78716C', marginTop: 2 }}>{crew.checks.length} SOC{crew.checks.length !== 1 ? 's' : ''} this period</p></div>
+                        <button onClick={() => setSelectedCrew(null)} style={{ color: '#78716C', padding: 4, background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" size={20} /></button>
                       </div>
                     </div>
-                    <div style={{ flex:1, overflow:'auto', padding:'12px 16px' }}>
-                      {crew.checks.map((c,i) => (
-                        <div key={c.id} className="card" style={{ marginBottom:8, display:'flex', alignItems:'center', gap:12 }}>
-                          <div style={{ flex:1 }}>
-                            <div style={{ fontSize:14, fontWeight:500 }}>{c.templateName}</div>
-                            <div style={{ fontSize:12, color:'#78716C', marginTop:2 }}>{fmtDate(c.date)} · {c.trainerName}</div>
-                            {c.comment && <div style={{ fontSize:12, color:'#78716C', marginTop:4, fontStyle:'italic' }}>"{c.comment}"</div>}
-                          </div>
+                    <div style={{ flex: 1, overflow: 'auto', padding: '12px 16px' }}>
+                      {crew.checks.map(c => (
+                        <div key={c.id} className="card" style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 500 }}>{c.templateName}</div><div style={{ fontSize: 12, color: '#78716C', marginTop: 2 }}>{fmtDate(c.date)} · {c.trainerName}</div>{c.comment && <div style={{ fontSize: 12, color: '#78716C', marginTop: 4, fontStyle: 'italic' }}>"{c.comment}"</div>}</div>
                           <ScorePill score={c.score} />
                         </div>
                       ))}
                     </div>
-                    <div style={{ padding:'14px 16px 28px', background:'#fff', borderTop:'1px solid #EEEDEB', flexShrink:0, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                      <span style={{ fontSize:13, color:'#78716C', fontWeight:500 }}>Average Score</span>
-                      <ScorePill score={crew.avg} />
+                    <div style={{ padding: '14px 16px 28px', background: '#fff', borderTop: '1px solid #EEEDEB', flexShrink: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: 13, color: '#78716C', fontWeight: 500 }}>Average Score</span><ScorePill score={crew.avg} />
                     </div>
                   </div>
                 </div>
@@ -1839,88 +762,50 @@ function ReportsScreen({ data, user }) {
           </div>
         );
       })()}
-    </div>);
-
+    </div>
+  );
 }
 
-// ─── Templates Screen (Admin only) ────────────────────────────────────────────
-function TemplatesScreen({ data, onUpdate }) {
-  const [libTab,      setLibTab]      = useState('templates');
-  const [batch,       setBatch]       = useState([]);
-  const [showSheet,   setShowSheet]   = useState(false);
-  const [saving,      setSaving]      = useState(false);
+// ─── Library (Admin): templates + team ─────────────────────────────────────────
+function TemplatesScreen({ data, currentUserId, onAddTemplates, onDeleteTemplate, onAddUser, onRemoveUser, onToast }) {
+  const [libTab, setLibTab] = useState('templates');
+  const [batch, setBatch] = useState([]);
+  const [showSheet, setShowSheet] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [showAddUser, setShowAddUser] = useState(false);
-  const [newUser,     setNewUser]     = useState({ name: '', role: 'teamleader' });
+  const [newUser, setNewUser] = useState({ name: '', role: 'teamleader', pin: '' });
+  const [addBusy, setAddBusy] = useState(false);
+  const [addErr, setAddErr] = useState('');
   const fileRef = useRef();
 
   async function parseFile(file) {
     const ext = file.name.split('.').pop().toLowerCase();
     let items = [];
     try {
-      if (ext === 'csv' || ext === 'txt') {
-        const text = await file.text();
-        items = text.split('\n').map((l) => l.trim()).filter((l) => l.length > 3);
-      } else if (ext === 'docx' || ext === 'doc') {
-        if (!window.JSZip) {
-          await new Promise((res, rej) => {const s = document.createElement('script');s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';s.onload = res;s.onerror = rej;document.head.appendChild(s);});
-        }
-        const ab = await file.arrayBuffer();
-        const zip = new window.JSZip();
-        await zip.loadAsync(ab);
+      if (ext === 'csv' || ext === 'txt') { const text = await file.text(); items = text.split('\n').map(l => l.trim()).filter(l => l.length > 3); }
+      else if (ext === 'docx' || ext === 'doc') {
+        if (!window.JSZip) await new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+        const ab = await file.arrayBuffer(); const zip = new window.JSZip(); await zip.loadAsync(ab);
         const xml = await zip.file('word/document.xml').async('string');
-        items = xml.replace(/<[^>]+>/g, '\n').split('\n').map((l) => l.trim()).filter((l) => l.length > 5 && !/^[A-Z0-9_:]+$/.test(l));
+        items = xml.replace(/<[^>]+>/g, '\n').split('\n').map(l => l.trim()).filter(l => l.length > 5 && !/^[A-Z0-9_:]+$/.test(l));
       } else if (ext === 'xlsx' || ext === 'xls') {
-        if (!window.XLSX) {
-          await new Promise((res, rej) => {const s = document.createElement('script');s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';s.onload = res;s.onerror = rej;document.head.appendChild(s);});
-        }
-        const ab = await file.arrayBuffer();
-        const wb = window.XLSX.read(ab, { type: 'array' });
-        const ws = wb.Sheets[wb.SheetNames[0]];
-        const rows = window.XLSX.utils.sheet_to_json(ws, { header: 1 });
-        items = rows.flat().map((c) => String(c || '').trim()).filter((c) => c.length > 3);
-      } else {
-        return { name: file.name, department: '', items: [], error: 'Unsupported format' };
-      }
+        if (!window.XLSX) await new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+        const ab = await file.arrayBuffer(); const wb = window.XLSX.read(ab, { type: 'array' });
+        const rows = window.XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1 });
+        items = rows.flat().map(c => String(c || '').trim()).filter(c => c.length > 3);
+      } else return { name: file.name, department: '', items: [], error: 'Unsupported format' };
       return { name: file.name.replace(/\.[^.]+$/, ''), department: '', items, error: null };
-    } catch (e) {
-      return { name: file.name, department: '', items: [], error: 'Parse error' };
-    }
+    } catch (e) { return { name: file.name, department: '', items: [], error: 'Parse error' }; }
   }
-
-  async function handleFiles(files) {
-    if (!files || !files.length) return;
-    setSaving(true);
-    const results = await Promise.all(Array.from(files).map(parseFile));
-    setBatch(results);
-    setSaving(false);
-    setShowSheet(true);
-  }
-
-  function updateBatch(i, field, value) {
-    setBatch((b) => b.map((item, idx) => idx === i ? { ...item, [field]: value } : item));
-  }
-
-  function saveAll() {
-    const valid = batch.filter((b) => b.name && b.department && b.items.length && !b.error);
+  async function handleFiles(files) { if (!files || !files.length) return; setSaving(true); setBatch(await Promise.all(Array.from(files).map(parseFile))); setSaving(false); setShowSheet(true); }
+  function updateBatch(i, field, value) { setBatch(b => b.map((item, idx) => idx === i ? { ...item, [field]: value } : item)); }
+  async function saveAll() {
+    const valid = batch.filter(b => b.name && b.department && b.items.length && !b.error);
     if (!valid.length) return;
-    const newTpls = valid.map((b) => ({
-      id: 'tpl_' + Date.now() + '_' + Math.random().toString(36).slice(2),
-      name: b.name,
-      department: b.department,
-      sections: [{ id: 'sec_' + Date.now(), name: 'Checklist', weight: 1,
-        items: b.items.map((text, i) => ({ id: 'ci_' + i + '_' + Date.now(), text })) }]
-    }));
-    onUpdate({ ...data, templates: [...data.templates, ...newTpls] });
-    setShowSheet(false);
-    setBatch([]);
+    const newTpls = valid.map(b => ({ id: 'tpl_' + Date.now() + '_' + Math.random().toString(36).slice(2), name: b.name, department: b.department, sections: [{ id: 'sec_' + Date.now(), name: 'Checklist', weight: 1, items: b.items.map((text, i) => ({ id: 'ci_' + i + '_' + Date.now(), text })) }] }));
+    try { await onAddTemplates(newTpls); setShowSheet(false); setBatch([]); } catch (e) { onToast(e.message); }
   }
-
-  function deleteTemplate(id) {
-    if (!confirm('Remove this template from the library?')) return;
-    onUpdate({ ...data, templates: data.templates.filter((t) => t.id !== id) });
-  }
-
-  const readyCount = batch.filter((b) => b.department && b.items.length && !b.error).length;
+  const readyCount = batch.filter(b => b.department && b.items.length && !b.error).length;
 
   return (
     <div className="screen fade-in">
@@ -1928,239 +813,162 @@ function TemplatesScreen({ data, onUpdate }) {
         <button className={'tab-btn' + (libTab === 'templates' ? ' active' : '')} onClick={() => setLibTab('templates')}>Templates</button>
         <button className={'tab-btn' + (libTab === 'team' ? ' active' : '')} onClick={() => setLibTab('team')}>Team</button>
       </div>
-      {libTab === 'templates' && (<>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em' }}>Template Library</h2>
-        <button onClick={() => fileRef.current?.click()} disabled={saving} style={{
-          display: 'flex', gap: 6, alignItems: 'center', padding: '9px 14px',
-          borderRadius: 10, background: 'linear-gradient(135deg,#1565C0,#6A1FC2)',
-          color: '#fff', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer', opacity: saving ? 0.6 : 1
-        }}>
-          <Icon name="upload" size={14} color="#fff" /> {saving ? 'Reading…' : 'Upload Files'}
-        </button>
-        <input ref={fileRef} type="file" multiple accept=".docx,.xlsx,.xls,.csv,.txt,.doc"
-        style={{ display: 'none' }}
-        onChange={(e) => {handleFiles(e.target.files);e.target.value = '';}} />
-      </div>
-      <p style={{ fontSize: 12, color: '#A8A29E', marginBottom: 16 }}>Select multiple files at once — hold Cmd / Ctrl when picking</p>
 
-      <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: 16 }}>
-        {data.templates.length === 0 &&
-        <div style={{ textAlign: 'center', padding: '48px 16px', color: '#A8A29E', fontSize: 14 }}>No templates yet — tap Upload Files to add yours</div>
-        }
-        {data.templates.map((t, i) =>
-        <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: i < data.templates.length - 1 ? '1px solid #F5F4F1' : 'none' }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 500 }}>{t.name}</div>
-              <div style={{ fontSize: 12, color: '#78716C', marginTop: 2 }}>{t.sections.reduce((n, s) => n + s.items.length, 0)} items</div>
+      {libTab === 'templates' && <>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <h2 style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em' }}>Template Library</h2>
+          <button onClick={() => fileRef.current?.click()} disabled={saving} style={{ display: 'flex', gap: 6, alignItems: 'center', padding: '9px 14px', borderRadius: 10, background: 'linear-gradient(135deg,#1565C0,#6A1FC2)', color: '#fff', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer', opacity: saving ? 0.6 : 1 }}><Icon name="upload" size={14} color="#fff" /> {saving ? 'Reading…' : 'Upload Files'}</button>
+          <input ref={fileRef} type="file" multiple accept=".docx,.xlsx,.xls,.csv,.txt,.doc" style={{ display: 'none' }} onChange={e => { handleFiles(e.target.files); e.target.value = ''; }} />
+        </div>
+        <p style={{ fontSize: 12, color: '#A8A29E', marginBottom: 16 }}>Select multiple files at once — hold Cmd / Ctrl when picking</p>
+        <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: 16 }}>
+          {data.templates.length === 0 && <div style={{ textAlign: 'center', padding: '48px 16px', color: '#A8A29E', fontSize: 14 }}>No templates yet — tap Upload Files to add yours</div>}
+          {data.templates.map((t, i) => (
+            <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: i < data.templates.length - 1 ? '1px solid #F5F4F1' : 'none' }}>
+              <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 500 }}>{t.name}</div><div style={{ fontSize: 12, color: '#78716C', marginTop: 2 }}>{t.sections.reduce((n, s) => n + s.items.length, 0)} items</div></div>
+              <button onClick={async () => { if (!confirm('Remove this template?')) return; try { await onDeleteTemplate(t.id); } catch (e) { onToast(e.message); } }} style={{ padding: 6, color: '#A8A29E', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" size={16} /></button>
             </div>
-            <button onClick={() => deleteTemplate(t.id)} style={{ padding: 6, color: '#A8A29E', background: 'none', border: 'none', cursor: 'pointer' }}>
-              <Icon name="x" size={16} />
-            </button>
-          </div>
-        )}
-      </div>
+          ))}
+        </div>
 
-      {/* Batch review sheet */}
-      {showSheet &&
-      <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 100, display: 'flex', alignItems: 'flex-end' }}
-      onClick={() => setShowSheet(false)}>
-          <div onClick={(e) => e.stopPropagation()} style={{ background: '#F7F6F3', borderRadius: '20px 20px 0 0', width: '100%', maxWidth: 480, maxHeight: '90vh', overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+        {showSheet && <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 100, display: 'flex', alignItems: 'flex-end' }} onClick={() => setShowSheet(false)}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#F7F6F3', borderRadius: '20px 20px 0 0', width: '100%', maxWidth: 480, maxHeight: '90vh', overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
             <div style={{ padding: '20px 20px 12px', background: '#fff', borderBottom: '1px solid #EEEDEB', borderRadius: '20px 20px 0 0', flexShrink: 0 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <h3 style={{ fontSize: 16, fontWeight: 700 }}>Review Uploads</h3>
-                  <p style={{ fontSize: 12, color: '#78716C', marginTop: 2 }}>{batch.length} file{batch.length !== 1 ? 's' : ''} — assign a department to each</p>
-                </div>
+                <div><h3 style={{ fontSize: 16, fontWeight: 700 }}>Review Uploads</h3><p style={{ fontSize: 12, color: '#78716C', marginTop: 2 }}>{batch.length} file{batch.length !== 1 ? 's' : ''} — assign a department to each</p></div>
                 <button onClick={() => setShowSheet(false)} style={{ color: '#78716C', padding: 4, background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" size={20} /></button>
               </div>
             </div>
-
             <div style={{ flex: 1, overflow: 'auto', padding: '14px 16px' }}>
-              {batch.map((b, i) =>
-            <div key={i} className="card" style={{ marginBottom: 10, opacity: b.error ? 0.5 : 1 }}>
+              {batch.map((b, i) => (
+                <div key={i} className="card" style={{ marginBottom: 10, opacity: b.error ? 0.5 : 1 }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: b.error ? 0 : 10 }}>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: '#1C1917' }}>{b.name}</div>
-                      {b.error ?
-                  <div style={{ fontSize: 12, color: '#DC2626', marginTop: 2 }}>{b.error}</div> :
-                  <div style={{ fontSize: 12, color: '#78716C', marginTop: 2 }}>{b.items.length} items detected</div>
-                  }
-                    </div>
+                    <div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: '#1C1917' }}>{b.name}</div>{b.error ? <div style={{ fontSize: 12, color: '#DC2626', marginTop: 2 }}>{b.error}</div> : <div style={{ fontSize: 12, color: '#78716C', marginTop: 2 }}>{b.items.length} items detected</div>}</div>
                     {b.department && !b.error && <Icon name="check" size={16} color="#059669" sw={2.5} />}
                   </div>
-                  {!b.error &&
-              <select className="soc-input soc-select" value={b.department}
-              onChange={(e) => updateBatch(i, 'department', e.target.value)}
-              style={{ fontSize: 13, padding: '9px 12px' }}>
-                      <option value="">Assign department…</option>
-                      {DEPARTMENTS.map((d) => <option key={d} value={d}>{d}</option>)}
-                    </select>
-              }
+                  {!b.error && <select className="soc-input soc-select" value={b.department} onChange={e => updateBatch(i, 'department', e.target.value)} style={{ fontSize: 13, padding: '9px 12px' }}><option value="">Assign department…</option>{DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}</select>}
                 </div>
-            )}
+              ))}
             </div>
-
             <div style={{ padding: '12px 16px 32px', background: '#fff', borderTop: '1px solid #EEEDEB', flexShrink: 0 }}>
-              <button className="btn-primary" onClick={saveAll}
-            disabled={readyCount === 0}
-            style={{ opacity: readyCount > 0 ? 1 : 0.35 }}>
-                Save {readyCount} Template{readyCount !== 1 ? 's' : ''} to Library
-              </button>
+              <button className="btn-primary" onClick={saveAll} disabled={readyCount === 0} style={{ opacity: readyCount > 0 ? 1 : 0.35 }}>Save {readyCount} Template{readyCount !== 1 ? 's' : ''} to Library</button>
             </div>
           </div>
+        </div>}
+      </>}
+
+      {libTab === 'team' && <div className="fade-in">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+          <p className="label" style={{ margin: 0 }}>Team Members</p>
+          <button onClick={() => { setNewUser({ name: '', role: 'teamleader', pin: '' }); setAddErr(''); setShowAddUser(true); }} style={{ display: 'flex', gap: 6, alignItems: 'center', padding: '8px 14px', borderRadius: 10, background: 'linear-gradient(135deg,#1565C0,#6A1FC2)', color: '#fff', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer' }}><Icon name="plus" size={14} color="#fff" /> Add Member</button>
         </div>
-      }
-      </>)}
-      {libTab === 'team' && (
-        <div className="fade-in">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-            <p className="label" style={{ margin: 0 }}>Team Members</p>
-            <button onClick={() => { setNewUser({ name: '', role: 'teamleader' }); setShowAddUser(true); }} style={{
-              display: 'flex', gap: 6, alignItems: 'center', padding: '8px 14px', borderRadius: 10,
-              background: 'linear-gradient(135deg,#1565C0,#6A1FC2)', color: '#fff', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer',
-            }}><Icon name="plus" size={14} color="#fff" /> Add Member</button>
-          </div>
-          {['admin','manager','trainer','teamleader'].map(role => {
-            const members = data.users.filter(u => u.role === role);
-            if (!members.length) return null;
-            return (
-              <div key={role} style={{ marginBottom: 16 }}>
-                <p className="label">{ROLES[role]}s</p>
-                <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-                  {members.map((u, i) => (
-                    <div key={u.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: i < members.length - 1 ? '1px solid #F5F4F1' : 'none' }}>
-                      <div style={{ width: 36, height: 36, borderRadius: 99, background: ROLE_COLOR[u.role] + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <Icon name="user" size={16} color={ROLE_COLOR[u.role]} />
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 14, fontWeight: 500 }}>{u.name}</div>
-                        <div style={{ fontSize: 12, color: '#78716C' }}>{ROLES[u.role]}</div>
-                      </div>
-                      {u.id !== 'u15' && (
-                        <button onClick={() => { if (!confirm('Remove ' + u.name + '?')) return; onUpdate({ ...data, users: data.users.filter(x => x.id !== u.id) }); }}
-                          style={{ padding: 6, color: '#A8A29E', background: 'none', border: 'none', cursor: 'pointer' }}>
-                          <Icon name="x" size={16} />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-          {showAddUser && (
-            <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 100, display: 'flex', alignItems: 'flex-end' }}
-              onClick={() => setShowAddUser(false)}>
-              <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: '20px 20px 0 0', width: '100%', maxWidth: 480, padding: '22px 20px 36px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                  <h3 style={{ fontSize: 16, fontWeight: 700 }}>Add Team Member</h3>
-                  <button onClick={() => setShowAddUser(false)} style={{ color: '#78716C', padding: 4, background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" size={20} /></button>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                  <div>
-                    <p className="label">Full Name</p>
-                    <input className="soc-input" placeholder="e.g. Sarah M." value={newUser.name}
-                      onChange={e => setNewUser(u => ({ ...u, name: e.target.value }))} />
+        {['admin', 'manager', 'trainer', 'teamleader'].map(role => {
+          const members = data.users.filter(u => u.role === role);
+          if (!members.length) return null;
+          return (
+            <div key={role} style={{ marginBottom: 16 }}>
+              <p className="label">{ROLES[role]}s</p>
+              <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+                {members.map((u, i) => (
+                  <div key={u.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: i < members.length - 1 ? '1px solid #F5F4F1' : 'none' }}>
+                    <div style={{ width: 36, height: 36, borderRadius: 99, background: ROLE_COLOR[u.role] + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Icon name="user" size={16} color={ROLE_COLOR[u.role]} /></div>
+                    <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 500 }}>{u.name}</div><div style={{ fontSize: 12, color: '#78716C' }}>{ROLES[u.role]}</div></div>
+                    {u.id !== currentUserId && <button onClick={async () => { if (!confirm('Remove ' + u.name + '?')) return; try { await onRemoveUser(u.id); } catch (e) { onToast(e.message); } }} style={{ padding: 6, color: '#A8A29E', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" size={16} /></button>}
                   </div>
-                  <div>
-                    <p className="label">Role</p>
-                    <select className="soc-input soc-select" value={newUser.role}
-                      onChange={e => setNewUser(u => ({ ...u, role: e.target.value }))}>
-                      <option value="teamleader">Team Leader</option>
-                      <option value="trainer">Crew Trainer</option>
-                      <option value="manager">Manager</option>
-                      <option value="admin">GM / Dept. Manager</option>
-                    </select>
-                  </div>
-                </div>
-                <button className="btn-primary" style={{ marginTop: 20, opacity: newUser.name.trim() ? 1 : 0.35 }}
-                  disabled={!newUser.name.trim()}
-                  onClick={() => {
-                    const u = { id: 'u_' + Date.now(), name: newUser.name.trim(), role: newUser.role, outlet: 'Brock' };
-                    onUpdate({ ...data, users: [...data.users, u] });
-                    setShowAddUser(false); setNewUser({ name: '', role: 'teamleader' });
-                  }}>Add to Team</button>
+                ))}
               </div>
             </div>
-          )}
-        </div>
-      )}
+          );
+        })}
+        {showAddUser && <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 100, display: 'flex', alignItems: 'flex-end' }} onClick={() => setShowAddUser(false)}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: '20px 20px 0 0', width: '100%', maxWidth: 480, padding: '22px 20px 36px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}><h3 style={{ fontSize: 16, fontWeight: 700 }}>Add Team Member</h3><button onClick={() => setShowAddUser(false)} style={{ color: '#78716C', padding: 4, background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" size={20} /></button></div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div><p className="label">Full Name</p><input className="soc-input" placeholder="e.g. Sarah M." value={newUser.name} onChange={e => setNewUser(u => ({ ...u, name: e.target.value }))} /></div>
+              <div><p className="label">Role</p><select className="soc-input soc-select" value={newUser.role} onChange={e => setNewUser(u => ({ ...u, role: e.target.value }))}><option value="teamleader">Team Leader</option><option value="trainer">Crew Trainer</option><option value="manager">Manager</option><option value="admin">GM / Dept. Manager</option></select></div>
+              <div><p className="label">6-digit PIN</p><input className="soc-input" inputMode="numeric" maxLength={6} placeholder="••••••" value={newUser.pin} onChange={e => setNewUser(u => ({ ...u, pin: e.target.value.replace(/\D/g, '').slice(0, 6) }))} /></div>
+            </div>
+            {addErr && <p style={{ color: '#DC2626', fontSize: 13, marginTop: 12 }}>{addErr}</p>}
+            <button className="btn-primary" style={{ marginTop: 20, opacity: (newUser.name.trim() && newUser.pin.length === 6 && !addBusy) ? 1 : 0.35 }} disabled={!(newUser.name.trim() && newUser.pin.length === 6) || addBusy}
+              onClick={async () => {
+                setAddBusy(true); setAddErr('');
+                try { await onAddUser({ name: newUser.name.trim(), role: newUser.role, pin: newUser.pin }); setShowAddUser(false); setNewUser({ name: '', role: 'teamleader', pin: '' }); }
+                catch (e) { setAddErr(e.message + ' — you may need to deploy the admin function (see SETUP.md), or add the user in the Supabase dashboard.'); }
+                finally { setAddBusy(false); }
+              }}>{addBusy ? 'Adding…' : 'Add to Team'}</button>
+          </div>
+        </div>}
+      </div>}
     </div>
   );
 }
 
 // ─── App Root ──────────────────────────────────────────────────────────────────
 function App() {
+  const [phase, setPhase] = useState('boot'); // boot | setup | login | app
   const [user, setUser] = useState(null);
   const [data, setData] = useState(null);
   const [tab, setTab] = useState('dashboard');
   const [viewCheck, setViewCheck] = useState(null);
   const [submitted, setSubmitted] = useState(null);
+  const [toast, setToast] = useState('');
 
-  useEffect(() => {setData(loadAppData());}, []);
+  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(''), 4000); return () => clearTimeout(t); } }, [toast]);
 
-  function persist(d) {setData(d);saveAppData(d);}
+  useEffect(() => { (async () => {
+    if (!SocDB.configured()) { setPhase('setup'); return; }
+    SocDB.init();
+    try {
+      const u = await SocDB.currentUser();
+      if (u) { const d = await SocDB.loadData(); setUser(u); setData(d); setPhase('app'); }
+      else setPhase('login');
+    } catch (e) { setPhase('login'); }
+  })(); }, []);
 
-  if (!data) {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: '#78716C', fontFamily: 'DM Sans, sans-serif' }}>
-        Loading…
-      </div>);
+  async function afterAuth() { const u = await SocDB.currentUser(); const d = await SocDB.loadData(); setUser(u); setData(d); setTab('dashboard'); setPhase('app'); }
+  async function reload() { try { setData(await SocDB.loadData()); } catch (e) { setToast(e.message); } }
+  async function logout() { await SocDB.signOut(); setUser(null); setData(null); setPhase('login'); }
+  async function saveCheck(check) { await SocDB.insertCheck(check); await reload(); setSubmitted(check); setTab('dashboard'); }
 
-  }
+  const addTemplates = async tpls => { await SocDB.addTemplates(tpls); await reload(); };
+  const deleteTemplate = async id => { await SocDB.deleteTemplate(id); await reload(); };
+  const addUser = async u => { await SocDB.addUser(u); await reload(); };
+  const removeUser = async id => { await SocDB.removeUser(id); await reload(); };
 
-  if (!user) {
-    return (
-      <div className="app-shell">
-        <div style={{ flex: 1, overflowY: 'auto' }}>
-          <LoginScreen users={data.users} onLogin={(u) => {setUser(u);setTab('dashboard');}} />
-        </div>
-      </div>);
-
-  }
+  if (phase === 'boot') return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: '#78716C' }}>Loading…</div>;
+  if (phase === 'setup') return <div className="app-shell"><div style={{ flex: 1, overflowY: 'auto' }}><SetupScreen /></div></div>;
+  if (phase === 'login') return <div className="app-shell"><div style={{ flex: 1, overflowY: 'auto' }}><LoginScreen onAuthed={afterAuth} /></div></div>;
 
   return (
     <div className="app-shell">
-      {/* Submit success modal */}
-      {submitted &&
-      <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
-      onClick={() => setSubmitted(null)}>
-          <div onClick={(e) => e.stopPropagation()} className="card fade-in" style={{ width: '100%', maxWidth: 340, textAlign: 'center', padding: 28 }}>
-            <div style={{ width: 60, height: 60, borderRadius: 99, background: scoreStyle(submitted.score).bg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
-              <Icon name="check" size={30} color={scoreStyle(submitted.score).color} sw={2.5} />
-            </div>
-            <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>Check Submitted</h3>
-            <p style={{ fontSize: 13, color: '#78716C', marginBottom: 14 }}>{submitted.traineeName}</p>
-            <div style={{ fontSize: 48, fontWeight: 700, color: scoreStyle(submitted.score).color, letterSpacing: '-0.04em', marginBottom: 6 }}>{submitted.score}%</div>
-            <button className="btn-primary" onClick={() => setSubmitted(null)}>Done</button>
-          </div>
+      {submitted && <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }} onClick={() => setSubmitted(null)}>
+        <div onClick={e => e.stopPropagation()} className="card fade-in" style={{ width: '100%', maxWidth: 340, textAlign: 'center', padding: 28 }}>
+          <div style={{ width: 60, height: 60, borderRadius: 99, background: scoreStyle(submitted.score).bg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}><Icon name="check" size={30} color={scoreStyle(submitted.score).color} sw={2.5} /></div>
+          <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>Check Submitted</h3>
+          <p style={{ fontSize: 13, color: '#78716C', marginBottom: 14 }}>{submitted.traineeName}</p>
+          <div style={{ fontSize: 48, fontWeight: 700, color: scoreStyle(submitted.score).color, letterSpacing: '-0.04em', marginBottom: 6 }}>{submitted.score}%</div>
+          <button className="btn-primary" onClick={() => setSubmitted(null)}>Done</button>
         </div>
-      }
+      </div>}
 
       {viewCheck && <CheckDetailModal check={viewCheck} data={data} onClose={() => setViewCheck(null)} />}
+      {toast && <div className="toast">{toast}</div>}
 
-      <TopBar user={user} onLogout={() => {setUser(null);setTab('dashboard');}} />
+      <TopBar user={user} onLogout={logout} />
 
-      {tab === 'new' ?
-      <NewCheckScreen data={data} user={user}
-      onSave={(d, c) => {persist(d);setSubmitted(c);setTab('dashboard');}}
-      onBack={() => setTab('dashboard')} /> :
-
-      <>
-          <div className="main-area">
+      {tab === 'new'
+        ? <NewCheckScreen data={data} user={user} onSave={saveCheck} onBack={() => setTab('dashboard')} />
+        : <div className="main-area">
             <BottomNav tab={tab} setTab={setTab} role={user.role} />
             <div className="content-wrap">
               {tab === 'dashboard' && <DashboardScreen data={data} user={user} onNewCheck={() => setTab('new')} onViewCheck={setViewCheck} />}
-              {tab === 'history' && <HistoryScreen data={data} user={user} onViewCheck={setViewCheck} />}
-              {tab === 'reports' && <ReportsScreen data={data} user={user} />}
-              {tab === 'templates' && <TemplatesScreen data={data} onUpdate={persist} />}
+              {tab === 'history' && <HistoryScreen data={data} onViewCheck={setViewCheck} />}
+              {tab === 'reports' && <ReportsScreen data={data} />}
+              {tab === 'templates' && <TemplatesScreen data={data} currentUserId={user.id} onAddTemplates={addTemplates} onDeleteTemplate={deleteTemplate} onAddUser={addUser} onRemoveUser={removeUser} onToast={setToast} />}
             </div>
-          </div>
-        </>
-      }
-    </div>);
-
+          </div>}
+    </div>
+  );
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
