@@ -84,14 +84,37 @@ admin created via Method A first, so you can log in to manage the rest.)
 
 ## Part 6 — Host it (5 min)
 
-The app is a single static file. Easiest free option — **Netlify Drop**:
+The app is an **installable PWA**, so it ships as a small **folder** of files that must
+be served together from the same web address:
 
-1. Rename/keep the file as `index.html`.
-2. Go to **https://app.netlify.com/drop** and drag `index.html` on.
+```
+index.html   manifest.webmanifest   sw.js   icon-192.png   icon-512.png   icon-180.png
+```
+
+Easiest free option — **Netlify Drop**:
+
+1. Put those 6 files in one folder (they're already together in this repo's root).
+2. Go to **https://app.netlify.com/drop** and **drag the whole folder** on (not a single file).
 3. You get a live URL. Sign up (free) to keep it permanently and rename it.
 
-Open the URL on any phone or laptop → pick your name → enter your PIN. Done.
-On phones: **Share → Add to Home Screen** to pin it like an app.
+> Alternatively, enable **GitHub Pages** on your repo (Settings → Pages → deploy from
+> `main`, root) and it hosts the same folder automatically.
+
+Open the URL on any phone or laptop → pick your name → enter your PIN.
+
+### Install it like an app (all devices)
+
+Because it's a PWA, it installs to the home screen and launches **fullscreen** (no
+browser bar), opens **instantly**, and even opens **offline** (showing the last-loaded
+data; submitting a new check still needs a connection).
+
+- **iPhone / iPad (Safari):** open the URL → **Share** → **Add to Home Screen**.
+- **Android (Chrome):** open the URL → tap the **Install app** prompt (or menu → Install).
+- **Desktop (Chrome/Edge):** click the **install icon** in the address bar.
+
+> Note: a PWA installs straight from the web — it is **not** in the Apple App Store or
+> Google Play (those require paid developer accounts). On iPhone, web push notifications
+> are limited, which doesn't affect this app.
 
 ---
 
