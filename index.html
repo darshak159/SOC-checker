@@ -6,7 +6,8 @@
   <title>SOC Checker</title>
   <!-- PWA: installable on iOS / Android / desktop -->
   <link rel="manifest" href="./manifest.webmanifest">
-  <meta name="theme-color" content="#1565C0">
+  <meta name="theme-color" content="#1565C0" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1C1917" media="(prefers-color-scheme: dark)">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -23,54 +24,92 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body, #root { height: 100%; }
-    body { font-family: 'DM Sans', -apple-system, system-ui, sans-serif; background: #E2E0DC; color: #1C1917; -webkit-font-smoothing: antialiased; }
+    :root {
+      color-scheme: light dark;
+      --page:#E2E0DC; --bg:#F7F6F3; --surface:#fff;
+      --subtle:#F5F4F1; --subtle2:#F9F8F6;
+      --border:#EEEDEB; --input-border:#E7E5E4; --hover:#EDECE9;
+      --text:#1C1917; --text-inv:#fff;
+      --muted:#78716C; --label:#A8A29E; --faint:#B5B0AB; --faint2:#C8C4C0;
+      --danger-bg:#FEF2F2; --danger-border:#FECACA;
+      --info-bg:#EFF6FF; --info-border:#BFDBFE; --info-strong:#1E40AF; --info-text:#1E3A5F;
+      --chart:#1565C0; --chart-wash:rgba(21,101,192,0.10);
+      --shell-shadow: 0 8px 48px rgba(0,0,0,0.13);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --page:#0F0D0C; --bg:#1C1917; --surface:#292524;
+        --subtle:#322E2B; --subtle2:#2B2724;
+        --border:#3A3532; --input-border:#44403C; --hover:#3A3532;
+        --text:#F5F4F1; --text-inv:#1C1917;
+        --muted:#A8A29E; --label:#8A8580; --faint:#6B6560; --faint2:#57534E;
+        --danger-bg:rgba(220,38,38,0.14); --danger-border:rgba(220,38,38,0.38);
+        --info-bg:rgba(59,130,246,0.12); --info-border:rgba(59,130,246,0.35); --info-strong:#93C5FD; --info-text:#BFDBFE;
+        --chart:#3B82F6; --chart-wash:rgba(59,130,246,0.13);
+        --shell-shadow: 0 8px 48px rgba(0,0,0,0.55);
+      }
+    }
+    body { font-family: 'DM Sans', -apple-system, system-ui, sans-serif; background: var(--page); color: var(--text); -webkit-font-smoothing: antialiased; }
     @media (min-width: 481px) { body { display: flex; align-items: stretch; justify-content: center; min-height: 100vh; } #root { width: 100%; display: flex; justify-content: center; } }
-    ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-thumb { background: #D6D3D1; border-radius: 9px; }
+    ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-thumb { background: var(--faint2); border-radius: 9px; }
     button, input, select, textarea { font-family: inherit; } button { cursor: pointer; border: none; background: none; padding: 0; }
-    .app-shell { width: 100%; max-width: 480px; min-height: 100%; background: #F7F6F3; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+    .app-shell { width: 100%; max-width: 480px; min-height: 100%; background: var(--bg); display: flex; flex-direction: column; position: relative; overflow: hidden; }
     .screen { flex: 1; overflow-y: auto; padding: 16px 16px 120px; }
-    .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; background: #fff; border-bottom: 1px solid #EEEDEB; flex-shrink: 0; z-index: 10; }
-    .bottom-nav { display: flex; align-items: stretch; border-top: 1px solid #EEEDEB; background: #fff; flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom, 0); }
-    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 4px 8px; gap: 3px; color: #B5B0AB; transition: color 0.12s; position: relative; }
-    .nav-item.active { color: #1C1917; } .nav-item span { font-size: 10px; font-weight: 500; }
-    .card { background: #fff; border-radius: 14px; border: 1px solid #EEEDEB; padding: 16px; }
-    .label { font-size: 11px; font-weight: 600; color: #A8A29E; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 7px; display: block; }
-    .btn-primary { display: block; width: 100%; padding: 14px 24px; border-radius: 13px; background: #1C1917; color: #fff; font-size: 15px; font-weight: 600; text-align: center; transition: opacity 0.12s, background 0.12s; cursor: pointer; }
-    .btn-primary:hover { background: #2C2926; } .btn-primary:active { background: #0C0A09; } .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
-    .btn-secondary { display: block; width: 100%; padding: 12px 24px; border-radius: 12px; background: #F5F4F1; color: #1C1917; font-size: 14px; font-weight: 500; text-align: center; border: 1px solid #EEEDEB; transition: background 0.12s; }
-    .btn-secondary:hover { background: #EDECE9; }
-    .soc-input { display: block; width: 100%; padding: 12px 14px; border: 1.5px solid #E7E5E4; border-radius: 11px; font-size: 15px; color: #1C1917; background: #fff; outline: none; transition: border-color 0.15s; }
-    .soc-input:focus { border-color: #1C1917; } .soc-input::placeholder { color: #B5B0AB; }
+    .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; z-index: 10; }
+    .bottom-nav { display: flex; align-items: stretch; border-top: 1px solid var(--border); background: var(--surface); flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom, 0); }
+    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 4px 8px; gap: 3px; color: var(--faint); transition: color 0.12s, transform 0.1s; position: relative; }
+    .nav-item:active { transform: scale(0.94); }
+    .nav-item.active { color: var(--text); } .nav-item span { font-size: 10px; font-weight: 500; }
+    .card { background: var(--surface); border-radius: 14px; border: 1px solid var(--border); padding: 16px; }
+    .label { font-size: 11px; font-weight: 600; color: var(--label); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 7px; display: block; }
+    .btn-primary { display: block; width: 100%; padding: 14px 24px; border-radius: 13px; background: var(--text); color: var(--text-inv); font-size: 15px; font-weight: 600; text-align: center; transition: opacity 0.12s, transform 0.1s; cursor: pointer; }
+    .btn-primary:hover { opacity: 0.92; } .btn-primary:active { transform: scale(0.985); } .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-secondary { display: block; width: 100%; padding: 12px 24px; border-radius: 12px; background: var(--subtle); color: var(--text); font-size: 14px; font-weight: 500; text-align: center; border: 1px solid var(--border); transition: background 0.12s; }
+    .btn-secondary:hover { background: var(--hover); }
+    .soc-input { display: block; width: 100%; padding: 12px 14px; border: 1.5px solid var(--input-border); border-radius: 11px; font-size: 15px; color: var(--text); background: var(--surface); outline: none; transition: border-color 0.15s; }
+    .soc-input:focus { border-color: var(--text); } .soc-input::placeholder { color: var(--faint); }
     .soc-select { appearance: none; cursor: pointer; }
-    .login-row { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 12px; background: #fff; border: 1.5px solid #EEEDEB; text-align: left; width: 100%; transition: border-color 0.12s; }
-    .login-row:hover { border-color: #A8A29E; } .login-row:active { background: #F9F8F6; }
-    .picker-btn { padding: 12px 16px; border-radius: 12px; font-size: 14px; font-weight: 500; border: 1.5px solid #EEEDEB; background: #fff; color: #1C1917; transition: all 0.12s; display: flex; justify-content: space-between; align-items: center; }
-    .picker-btn.active { background: #1C1917; border-color: #1C1917; color: #fff; } .picker-btn:hover:not(.active) { border-color: #A8A29E; }
-    .tpl-btn { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px; border-radius: 12px; border: 1.5px solid #EEEDEB; background: #fff; color: #1C1917; margin-bottom: 8px; transition: all 0.12s; }
-    .tpl-btn.active { background: #1C1917; border-color: #1C1917; color: #fff; } .tpl-btn:hover:not(.active) { border-color: #A8A29E; }
+    .login-row { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 12px; background: var(--surface); border: 1.5px solid var(--border); text-align: left; width: 100%; transition: border-color 0.12s, transform 0.1s; }
+    .login-row:hover { border-color: var(--label); } .login-row:active { background: var(--subtle2); transform: scale(0.99); }
+    .picker-btn { padding: 12px 16px; border-radius: 12px; font-size: 14px; font-weight: 500; border: 1.5px solid var(--border); background: var(--surface); color: var(--text); transition: all 0.12s; display: flex; justify-content: space-between; align-items: center; }
+    .picker-btn.active { background: var(--text); border-color: var(--text); color: var(--text-inv); } .picker-btn:hover:not(.active) { border-color: var(--label); }
+    .tpl-btn { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text); margin-bottom: 8px; transition: all 0.12s; }
+    .tpl-btn.active { background: var(--text); border-color: var(--text); color: var(--text-inv); } .tpl-btn:hover:not(.active) { border-color: var(--label); }
+    .tpl-btn:active { transform: scale(0.99); }
+    .rate-btn { transition: transform 0.1s, border-color 0.1s, background 0.1s; }
+    .rate-btn:active { transform: scale(0.88); }
     .score-pill { display: inline-flex; align-items: center; border-radius: 99px; padding: 3px 10px; font-size: 12px; font-weight: 700; white-space: nowrap; }
     .notif-badge { position: absolute; top: -4px; right: -4px; background: #DC2626; color: #fff; border-radius: 99px; font-size: 9px; font-weight: 700; min-width: 15px; height: 15px; display: flex; align-items: center; justify-content: center; padding: 0 3px; line-height: 1; }
-    .tab-strip { display: flex; gap: 2px; background: #EEEDEB; padding: 3px; border-radius: 10px; }
-    .tab-btn { flex: 1; padding: 7px 6px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #78716C; transition: all 0.15s; text-align: center; }
-    .tab-btn.active { background: #fff; color: #1C1917; box-shadow: 0 1px 3px rgba(0,0,0,0.07); }
+    .tab-strip { display: flex; gap: 2px; background: var(--border); padding: 3px; border-radius: 10px; }
+    .tab-btn { flex: 1; padding: 7px 6px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--muted); transition: all 0.15s; text-align: center; }
+    .tab-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.07); }
     .report-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .report-table th { text-align: left; padding: 9px 14px; color: #A8A29E; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #EEEDEB; white-space: nowrap; }
-    .report-table td { padding: 10px 14px; border-bottom: 1px solid #F5F4F1; vertical-align: middle; }
-    .report-table tr:last-child td { border-bottom: none; } .report-table tbody tr:hover td { background: #FAFAF9; }
+    .report-table th { text-align: left; padding: 9px 14px; color: var(--label); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    .report-table td { padding: 10px 14px; border-bottom: 1px solid var(--subtle); vertical-align: middle; }
+    .report-table tr:last-child td { border-bottom: none; } .report-table tbody tr:hover td { background: var(--subtle2); }
     .main-area { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
     .content-wrap { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
-    .pin-dot { width: 14px; height: 14px; border-radius: 99px; border: 2px solid #C8C4C0; transition: all 0.12s; }
-    .pin-dot.filled { background: #1C1917; border-color: #1C1917; }
-    .key-btn { height: 60px; border-radius: 14px; background: #fff; border: 1.5px solid #EEEDEB; font-size: 24px; font-weight: 600; color: #1C1917; display: flex; align-items: center; justify-content: center; transition: background 0.1s; }
-    .key-btn:active { background: #EDECE9; }
-    .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: #1C1917; color: #fff; padding: 12px 18px; border-radius: 12px; font-size: 13px; font-weight: 500; z-index: 400; max-width: 90%; box-shadow: 0 6px 24px rgba(0,0,0,0.2); }
+    .pin-dot { width: 14px; height: 14px; border-radius: 99px; border: 2px solid var(--faint2); transition: all 0.12s; }
+    .pin-dot.filled { background: var(--text); border-color: var(--text); }
+    .key-btn { height: 60px; border-radius: 14px; background: var(--surface); border: 1.5px solid var(--border); font-size: 24px; font-weight: 600; color: var(--text); display: flex; align-items: center; justify-content: center; transition: background 0.1s, transform 0.08s; }
+    .key-btn:active { background: var(--hover); transform: scale(0.94); }
+    .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--text); color: var(--text-inv); padding: 12px 18px; border-radius: 12px; font-size: 13px; font-weight: 500; z-index: 400; max-width: 90%; box-shadow: 0 6px 24px rgba(0,0,0,0.2); animation: fadeIn 0.2s ease; }
+    .spinner { width: 28px; height: 28px; border-radius: 99px; border: 3px solid var(--border); border-top-color: var(--muted); animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .skel { background: linear-gradient(90deg, var(--subtle) 25%, var(--hover) 50%, var(--subtle) 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 10px; }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+    .sheet-in { animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes slideUp { from { transform: translateY(28px); opacity: 0.5; } to { transform: none; opacity: 1; } }
+    .pop-in { animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    @keyframes popIn { 0% { transform: scale(0.4); opacity: 0; } 70% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
+    .chart-tip { position: absolute; pointer-events: none; background: var(--text); color: var(--text-inv); font-size: 11px; font-weight: 600; padding: 6px 9px; border-radius: 8px; white-space: nowrap; transform: translate(-50%, -110%); z-index: 20; box-shadow: 0 3px 12px rgba(0,0,0,0.18); }
     @media (min-width: 768px) {
-      body { background: #DDDBD7; } #root { align-items: flex-start; padding: 24px; }
-      .app-shell { max-width: 1060px; width: 100%; border-radius: 20px; box-shadow: 0 8px 48px rgba(0,0,0,0.13); overflow: hidden; min-height: calc(100vh - 48px); height: calc(100vh - 48px); }
+      #root { align-items: flex-start; padding: 24px; }
+      .app-shell { max-width: 1060px; width: 100%; border-radius: 20px; box-shadow: var(--shell-shadow); overflow: hidden; min-height: calc(100vh - 48px); height: calc(100vh - 48px); }
       .main-area { flex-direction: row; }
-      .bottom-nav { flex-direction: column; width: 200px; min-width: 200px; border-top: none; border-right: 1px solid #EEEDEB; padding: 16px 10px; height: 100%; align-items: stretch; gap: 2px; }
+      .bottom-nav { flex-direction: column; width: 200px; min-width: 200px; border-top: none; border-right: 1px solid var(--border); padding: 16px 10px; height: 100%; align-items: stretch; gap: 2px; }
       .nav-item { flex-direction: row; justify-content: flex-start; padding: 11px 14px; gap: 12px; border-radius: 11px; width: 100%; }
-      .nav-item span { font-size: 14px; font-weight: 500; } .nav-item.active { background: #F5F4F1; } .nav-item .notif-badge { top: -3px; right: -3px; }
+      .nav-item span { font-size: 14px; font-weight: 500; } .nav-item.active { background: var(--subtle); } .nav-item .notif-badge { top: -3px; right: -3px; }
       .screen { padding: 24px 32px 80px; } .app-shell > div { flex-direction: row; }
     }
     @media (min-width: 1024px) { .app-shell { max-width: 1200px; } .bottom-nav { width: 220px; min-width: 220px; } .screen { padding: 28px 40px 80px; } }
@@ -254,6 +293,111 @@ function Icon({ name, size = 20, color = 'currentColor', sw = 1.8 }) {
 function ScorePill({ score }) { const s = scoreStyle(score); return <span className="score-pill" style={{ color: s.color, background: s.bg }}>{score}%</span>; }
 const ROLE_COLOR = { teamleader: '#2563EB', trainer: '#7C3AED', manager: '#059669', admin: '#D97706' };
 
+// ─── Charts (inline SVG, single hue, hover tooltips) ──────────────────────────
+function useWidth() {
+  const ref = useRef(null);
+  const [w, setW] = useState(0);
+  useEffect(() => {
+    if (!ref.current) return;
+    const ro = new ResizeObserver(es => setW(es[0].contentRect.width));
+    ro.observe(ref.current);
+    return () => ro.disconnect();
+  }, []);
+  return [ref, w];
+}
+
+// Daily average score over the last N days — 2px line + 10% wash, end-label, tooltip.
+function TrendChart({ checks, days = 14 }) {
+  const [ref, w] = useWidth();
+  const [tip, setTip] = useState(null);
+  const H = 120, PAD_L = 30, PAD_R = 14, PAD_T = 16, PAD_B = 6;
+  const data = useMemo(() => {
+    const byDay = {};
+    checks.forEach(c => { (byDay[c.date] = byDay[c.date] || []).push(c.score); });
+    const out = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      const key = d.toISOString().split('T')[0];
+      const scores = byDay[key];
+      out.push({ key, i: out.length, label: d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' }),
+        avg: scores ? Math.round(scores.reduce((s, x) => s + x, 0) / scores.length) : null,
+        count: scores ? scores.length : 0 });
+    }
+    return out;
+  }, [checks, days]);
+  const have = data.filter(p => p.avg !== null);
+  if (have.length < 2) return null; // a trend needs at least two days of data
+  const iw = Math.max(w - PAD_L - PAD_R, 1), ih = H - PAD_T - PAD_B;
+  const x = i => PAD_L + (i / (days - 1)) * iw;
+  const y = v => PAD_T + (1 - v / 100) * ih;
+  const path = have.map((p, j) => (j === 0 ? 'M' : 'L') + x(p.i).toFixed(1) + ' ' + y(p.avg).toFixed(1)).join(' ');
+  const area = path + ` L ${x(have[have.length - 1].i).toFixed(1)} ${y(0).toFixed(1)} L ${x(have[0].i).toFixed(1)} ${y(0).toFixed(1)} Z`;
+  const last = have[have.length - 1];
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <p className="label">Score Trend — Last {days} Days</p>
+      <div className="card" style={{ padding: '12px 12px 8px' }}>
+        <div ref={ref} style={{ position: 'relative' }}>
+          {w > 0 && <svg width={w} height={H} style={{ display: 'block' }}>
+            {[0, 50, 100].map(v => (
+              <g key={v}>
+                <line x1={PAD_L} x2={w - PAD_R} y1={y(v)} y2={y(v)} stroke="var(--border)" strokeWidth="1" />
+                <text x={PAD_L - 6} y={y(v) + 3.5} textAnchor="end" fontSize="10" fill="var(--label)">{v}</text>
+              </g>
+            ))}
+            <path d={area} fill="var(--chart-wash)" />
+            <path d={path} fill="none" stroke="var(--chart)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            {have.map(p => (
+              <circle key={p.key} cx={x(p.i)} cy={y(p.avg)} r={p.key === last.key ? 4.5 : 3.5} fill="var(--chart)" stroke="var(--surface)" strokeWidth="2" />
+            ))}
+            <text x={Math.min(x(last.i), w - PAD_R)} y={y(last.avg) - 10} textAnchor={last.i > days - 3 ? 'end' : 'middle'} fontSize="11" fontWeight="700" fill="var(--text)">{last.avg}%</text>
+            {data.map(p => (
+              <rect key={'h' + p.key} x={x(p.i) - iw / (days * 2)} y={0} width={iw / days} height={H} fill="transparent"
+                onMouseEnter={() => p.avg !== null && setTip(p)} onMouseLeave={() => setTip(null)}
+                onTouchStart={() => p.avg !== null && setTip(p)} />
+            ))}
+          </svg>}
+          {tip && <div className="chart-tip" style={{ left: x(tip.i), top: y(tip.avg) - 6 }}>{tip.label} · {tip.avg}% · {tip.count} check{tip.count !== 1 ? 's' : ''}</div>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// One crew member's scores per check, oldest → newest. Columns ≤24px, 4px rounded caps.
+function CrewBars({ checks }) {
+  const [ref, w] = useWidth();
+  const [tip, setTip] = useState(null);
+  if (checks.length < 2) return null;
+  const H = 96, PAD_T = 18, PAD_B = 4;
+  const items = checks.slice().reverse(); // oldest first
+  const n = items.length;
+  const slot = Math.max(w / n, 1);
+  const bw = Math.min(24, Math.max(6, slot - 2)); // cap thickness, keep 2px surface gap
+  const y = v => PAD_T + (1 - v / 100) * (H - PAD_T - PAD_B);
+  const lastX = (n - 1) * slot + slot / 2;
+  return (
+    <div className="card" style={{ padding: '10px 12px 8px', marginBottom: 10 }}>
+      <div style={{ fontSize: 11, color: 'var(--label)', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 6 }}>Progress — oldest to newest</div>
+      <div ref={ref} style={{ position: 'relative' }}>
+        {w > 0 && <svg width={w} height={H} style={{ display: 'block' }}>
+          <line x1={0} x2={w} y1={y(0)} y2={y(0)} stroke="var(--border)" strokeWidth="1" />
+          {items.map((c, i) => {
+            const bx = i * slot + (slot - bw) / 2, by = y(c.score), bh = Math.max(y(0) - by, 4);
+            return <path key={c.id}
+              d={`M ${bx.toFixed(1)} ${(by + 4).toFixed(1)} a 4 4 0 0 1 4 -4 h ${(bw - 8).toFixed(1)} a 4 4 0 0 1 4 4 v ${(bh - 4).toFixed(1)} h ${(-bw).toFixed(1)} Z`}
+              fill="var(--chart)"
+              onMouseEnter={() => setTip({ ...c, i })} onMouseLeave={() => setTip(null)}
+              onTouchStart={() => setTip({ ...c, i })} />;
+          })}
+          <text x={Math.min(lastX, w - 14)} y={y(items[n - 1].score) - 6} textAnchor="middle" fontSize="10" fontWeight="700" fill="var(--text)">{items[n - 1].score}%</text>
+        </svg>}
+        {tip && <div className="chart-tip" style={{ left: Math.min(tip.i * slot + slot / 2, w - 40), top: y(tip.score) - 2 }}>{tip.templateName} · {fmtDate(tip.date)} · {tip.score}%</div>}
+      </div>
+    </div>
+  );
+}
+
 function Hero() {
   return (
     <div style={{ background: 'linear-gradient(145deg, #0F4C8A 0%, #1565C0 45%, #6A1FC2 100%)', padding: '64px 28px 52px', textAlign: 'center', position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
@@ -284,10 +428,10 @@ function SetupScreen() {
   return (
     <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
       <Hero />
-      <div style={{ flex: 1, padding: '28px 24px 48px', background: '#F7F6F3' }}>
-        <div className="card" style={{ marginBottom: 16, background: '#EFF6FF', border: '1px solid #BFDBFE' }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#1E40AF', marginBottom: 6 }}>One-time setup</div>
-          <p style={{ fontSize: 13, color: '#1E3A5F', lineHeight: 1.5 }}>Paste your Supabase project URL and <b>anon</b> public key. In Supabase: <b>Project Settings → API</b>. These are safe to use in the browser. See SETUP.md for the full guide.</p>
+      <div style={{ flex: 1, padding: '28px 24px 48px', background: 'var(--bg)' }}>
+        <div className="card" style={{ marginBottom: 16, background: 'var(--info-bg)', border: '1px solid var(--info-border)' }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--info-strong)', marginBottom: 6 }}>One-time setup</div>
+          <p style={{ fontSize: 13, color: 'var(--info-text)', lineHeight: 1.5 }}>Paste your Supabase project URL and <b>anon</b> public key. In Supabase: <b>Project Settings → API</b>. These are safe to use in the browser. See SETUP.md for the full guide.</p>
         </div>
         <p className="label">Project URL</p>
         <input className="soc-input" placeholder="https://xxxx.supabase.co" value={url} onChange={e => setUrl(e.target.value)} style={{ marginBottom: 16 }} />
@@ -309,18 +453,22 @@ function LoginScreen({ onAuthed }) {
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => { (async () => {
+  const loadDir = async () => {
+    setDir(null); setErr('');
     try { setDir(await SocDB.loginDirectory()); }
-    catch (e) { setErr('Could not reach the server. Check your setup.'); setDir([]); }
-  })(); }, []);
+    catch (e) { setErr('Could not reach the server — check your connection.'); setDir([]); }
+  };
+  useEffect(() => { loadDir(); }, []);
 
   const names = useMemo(() => (dir || []).filter(u => u.role === role), [dir, role]);
 
   async function submit(p) {
     if (busy) return;
     setBusy(true); setErr('');
-    try { await SocDB.signIn(pending.email, p); await onAuthed(); }
-    catch (e) { setErr('Incorrect PIN. Try again.'); setPin(''); setBusy(false); }
+    try { await SocDB.signIn(pending.email, p); }
+    catch (e) { setErr('Incorrect PIN. Try again.'); setPin(''); setBusy(false); return; }
+    try { await onAuthed(); }
+    catch (e) { setErr('Signed in, but could not load data — check your connection.'); setPin(''); setBusy(false); }
   }
   function press(d) {
     if (busy) return;
@@ -333,9 +481,11 @@ function LoginScreen({ onAuthed }) {
   return (
     <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
       <Hero />
-      <div style={{ flex: 1, padding: '30px 24px 48px', background: '#F7F6F3' }}>
+      <div style={{ flex: 1, padding: '30px 24px 48px', background: 'var(--bg)' }}>
         {!pending && <>
-          {dir === null && <p style={{ fontSize: 14, color: '#78716C' }}>Loading…</p>}
+          {dir === null && <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div className="skel" style={{ height: 46 }} /><div className="skel" style={{ height: 46, opacity: 0.7 }} /><div className="skel" style={{ height: 46, opacity: 0.4 }} />
+          </div>}
           {dir && <>
             <p className="label">Your Role</p>
             <select className="soc-input soc-select" value={role} onChange={e => setRole(e.target.value)} style={{ marginBottom: 24 }}>
@@ -355,20 +505,23 @@ function LoginScreen({ onAuthed }) {
                     </div>
                     <div style={{ flex: 1, textAlign: 'left' }}>
                       <div style={{ fontWeight: 600, fontSize: 15 }}>{u.display_name}</div>
-                      <div style={{ fontSize: 12, color: '#78716C', marginTop: 1 }}>{ROLES[u.role]}</div>
+                      <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 1 }}>{ROLES[u.role]}</div>
                     </div>
                     <Icon name="chevR" size={16} color="#C8C4C0" />
                   </button>
                 ))}
-                {names.length === 0 && <div style={{ padding: '24px 16px', textAlign: 'center', color: '#A8A29E', fontSize: 14 }}>No one in this role yet</div>}
+                {names.length === 0 && <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--label)', fontSize: 14 }}>No one in this role yet</div>}
               </div>
             </div>}
-            {err && <p style={{ color: '#DC2626', fontSize: 13, marginTop: 14 }}>{err}</p>}
+            {err && <div style={{ marginTop: 14 }}>
+              <p style={{ color: '#DC2626', fontSize: 13, marginBottom: 10 }}>{err}</p>
+              <button className="btn-secondary" onClick={loadDir}>Try Again</button>
+            </div>}
           </>}
         </>}
 
         {pending && <div className="fade-in">
-          <button onClick={() => { setPending(null); setPin(''); setErr(''); }} style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#78716C', marginBottom: 20, fontSize: 14 }}>
+          <button onClick={() => { setPending(null); setPin(''); setErr(''); }} style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--muted)', marginBottom: 20, fontSize: 14 }}>
             <Icon name="chevL" size={18} /> Back
           </button>
           <div style={{ textAlign: 'center', marginBottom: 8 }}>
@@ -376,7 +529,7 @@ function LoginScreen({ onAuthed }) {
               <Icon name="lock" size={22} color={ROLE_COLOR[pending.role]} />
             </div>
             <div style={{ fontSize: 17, fontWeight: 700 }}>{pending.display_name}</div>
-            <div style={{ fontSize: 13, color: '#78716C', marginTop: 2 }}>Enter your 6-digit PIN</div>
+            <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 2 }}>Enter your 6-digit PIN</div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 12, margin: '22px 0' }}>
             {[0, 1, 2, 3, 4, 5].map(i => <div key={i} className={'pin-dot' + (i < pin.length ? ' filled' : '')} />)}
@@ -388,7 +541,7 @@ function LoginScreen({ onAuthed }) {
             <button className="key-btn" onClick={() => press('0')}>0</button>
             <button className="key-btn" onClick={() => { setErr(''); setPin(pin.slice(0, -1)); }} style={{ fontSize: 18 }}>⌫</button>
           </div>
-          {busy && <p style={{ textAlign: 'center', color: '#78716C', fontSize: 13, marginTop: 16 }}>Signing in…</p>}
+          {busy && <p style={{ textAlign: 'center', color: 'var(--muted)', fontSize: 13, marginTop: 16 }}>Signing in…</p>}
         </div>}
       </div>
     </div>
@@ -404,7 +557,7 @@ function TopBar({ user, live, onLogout }) {
         </div>
         <div>
           <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em' }}>SOC Checker</div>
-          <div style={{ fontSize: 12, color: '#78716C', display: 'flex', gap: 4, alignItems: 'center' }}>
+          <div style={{ fontSize: 12, color: 'var(--muted)', display: 'flex', gap: 4, alignItems: 'center' }}>
             <span style={{ color: ROLE_COLOR[user.role], fontWeight: 500 }}>{ROLES[user.role]}</span><span>·</span>
             <span>{user.outlet !== 'All' ? user.outlet : 'All Outlets'}</span>
           </div>
@@ -413,9 +566,9 @@ function TopBar({ user, live, onLogout }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }} title={live ? 'Live — updates in real time' : 'Reconnecting…'}>
           <span style={{ width: 7, height: 7, borderRadius: 99, background: live ? '#22C55E' : '#D6D3D1', boxShadow: live ? '0 0 0 3px rgba(34,197,94,0.18)' : 'none', transition: 'all 0.2s' }} />
-          <span style={{ fontSize: 11, fontWeight: 600, color: live ? '#16A34A' : '#A8A29E' }}>{live ? 'Live' : '—'}</span>
+          <span style={{ fontSize: 11, fontWeight: 600, color: live ? '#16A34A' : 'var(--label)' }}>{live ? 'Live' : '—'}</span>
         </span>
-        <button onClick={onLogout} style={{ padding: 8, borderRadius: 8, color: '#78716C' }}><Icon name="logout" size={20} /></button>
+        <button onClick={onLogout} style={{ padding: 8, borderRadius: 8, color: 'var(--muted)' }}><Icon name="logout" size={20} /></button>
       </div>
     </div>
   );
@@ -454,27 +607,28 @@ function DashboardScreen({ data, user, onNewCheck, onViewCheck }) {
     <div className="screen fade-in">
       <div style={{ marginBottom: 20 }}>
         <h2 style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em' }}>{greet}, {user.name.split(' ')[0]}</h2>
-        <p style={{ fontSize: 13, color: '#78716C', marginTop: 2 }}>{fmtDate(today)}</p>
+        <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 2 }}>{fmtDate(today)}</p>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 16 }}>
         {[{ label: 'Today', value: todayChecks.length },
           { label: 'Avg Score', value: avgScore + '%', color: scoreStyle(avgScore).color },
           { label: 'Fails', value: failCount, color: failCount > 0 ? '#DC2626' : undefined }].map((s, i) => (
           <div key={i} className="card" style={{ textAlign: 'center', padding: '14px 6px' }}>
-            <div style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.1, color: s.color || '#1C1917' }}>{s.value}</div>
-            <div style={{ fontSize: 11, color: '#78716C', marginTop: 3 }}>{s.label}</div>
+            <div style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.1, color: s.color || 'var(--text)' }}>{s.value}</div>
+            <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 3 }}>{s.label}</div>
           </div>
         ))}
       </div>
+      <TrendChart checks={myChecks} />
       {(user.role === 'manager' || user.role === 'admin') && failAlerts.length > 0 && (
         <div style={{ marginBottom: 16 }}>
           <p className="label">Recent Fails</p>
           {failAlerts.map(c => (
-            <button key={c.id} onClick={() => onViewCheck(c)} style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '11px 14px', borderRadius: 12, marginBottom: 6, textAlign: 'left', background: '#FEF2F2', border: '1px solid #FECACA' }}>
+            <button key={c.id} onClick={() => onViewCheck(c)} style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '11px 14px', borderRadius: 12, marginBottom: 6, textAlign: 'left', background: 'var(--danger-bg)', border: '1px solid var(--danger-border)' }}>
               <Icon name="alert" size={17} color="#DC2626" />
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 500, color: '#1C1917' }}>{c.traineeName}{c.department ? ' — ' + c.department : ''}</div>
-                <div style={{ fontSize: 12, color: '#78716C' }}>{fmtDate(c.date)} · {c.outlet}</div>
+                <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)' }}>{c.traineeName}{c.department ? ' — ' + c.department : ''}</div>
+                <div style={{ fontSize: 12, color: 'var(--muted)' }}>{fmtDate(c.date)} · {c.outlet}</div>
               </div>
               <ScorePill score={c.score} />
             </button>
@@ -485,15 +639,19 @@ function DashboardScreen({ data, user, onNewCheck, onViewCheck }) {
       <p className="label">Recent Checks</p>
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
         {myChecks.slice(0, 10).map((c, i) => (
-          <button key={c.id} onClick={() => onViewCheck(c)} style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '11px 16px', textAlign: 'left', background: 'transparent', borderBottom: i < Math.min(myChecks.length - 1, 9) ? '1px solid #F5F4F1' : 'none' }}>
+          <button key={c.id} onClick={() => onViewCheck(c)} style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '11px 16px', textAlign: 'left', background: 'transparent', borderBottom: i < Math.min(myChecks.length - 1, 9) ? '1px solid var(--subtle)' : 'none' }}>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 14, fontWeight: 500 }}>{c.traineeName}</div>
-              <div style={{ fontSize: 12, color: '#78716C' }}>{c.templateName} · {fmtDate(c.date)}</div>
+              <div style={{ fontSize: 12, color: 'var(--muted)' }}>{c.templateName} · {fmtDate(c.date)}</div>
             </div>
             <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>{c.hasFail && <Icon name="alert" size={14} color="#DC2626" />}<ScorePill score={c.score} /></div>
           </button>
         ))}
-        {myChecks.length === 0 && <div style={{ padding: '36px 16px', textAlign: 'center', color: '#A8A29E', fontSize: 14 }}>No checks yet</div>}
+        {myChecks.length === 0 && <div style={{ padding: '40px 16px', textAlign: 'center' }}>
+          <div style={{ width: 44, height: 44, borderRadius: 99, background: 'var(--subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 10px' }}><Icon name="list" size={20} color="var(--faint)" /></div>
+          <p style={{ color: 'var(--label)', fontSize: 14, fontWeight: 500 }}>No checks yet</p>
+          <p style={{ color: 'var(--faint)', fontSize: 12, marginTop: 3 }}>Start your first SOC check to see it here</p>
+        </div>}
       </div>
     </div>
   );
@@ -503,39 +661,39 @@ function CheckDetailModal({ check, data, onClose }) {
   const tpl = data.templates.find(t => t.id === check.templateId);
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 100, display: 'flex', alignItems: 'flex-end' }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: '20px 20px 0 0', width: '100%', maxWidth: 480, maxHeight: '88vh', overflow: 'auto', padding: '20px 20px 32px' }}>
+      <div onClick={e => e.stopPropagation()} className="sheet-in" style={{ background: 'var(--surface)', borderRadius: '20px 20px 0 0', width: '100%', maxWidth: 480, maxHeight: '88vh', overflow: 'auto', padding: '20px 20px 32px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
           <div>
             <h3 style={{ fontSize: 16, fontWeight: 700 }}>{check.templateName}</h3>
-            <p style={{ fontSize: 13, color: '#78716C' }}>{check.outlet} · {fmtDate(check.date)}</p>
+            <p style={{ fontSize: 13, color: 'var(--muted)' }}>{check.outlet} · {fmtDate(check.date)}</p>
           </div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}><ScorePill score={check.score} /><button onClick={onClose} style={{ padding: 4, color: '#78716C' }}><Icon name="x" size={20} /></button></div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}><ScorePill score={check.score} /><button onClick={onClose} style={{ padding: 4, color: 'var(--muted)' }}><Icon name="x" size={20} /></button></div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
           {[['Trainee', check.traineeName], ['Trainer', check.trainerName]].map(([l, v]) => (
-            <div key={l} style={{ background: '#F9F8F6', borderRadius: 10, padding: '9px 12px' }}>
-              <div style={{ fontSize: 11, color: '#78716C', marginBottom: 2 }}>{l}</div>
+            <div key={l} style={{ background: 'var(--subtle2)', borderRadius: 10, padding: '9px 12px' }}>
+              <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 2 }}>{l}</div>
               <div style={{ fontSize: 13, fontWeight: 500 }}>{v}</div>
             </div>
           ))}
         </div>
         {check.comment && (
-          <div style={{ padding: '12px 14px', background: '#F9F8F6', borderRadius: 10, marginBottom: 14, border: '1px solid #EEEDEB' }}>
-            <div style={{ fontSize: 11, color: '#A8A29E', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 4 }}>Comments</div>
-            <p style={{ fontSize: 13, color: '#44403C', lineHeight: 1.55 }}>{check.comment}</p>
+          <div style={{ padding: '12px 14px', background: 'var(--subtle2)', borderRadius: 10, marginBottom: 14, border: '1px solid var(--border)' }}>
+            <div style={{ fontSize: 11, color: 'var(--label)', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 4 }}>Comments</div>
+            <p style={{ fontSize: 13, color: 'var(--muted)', lineHeight: 1.55 }}>{check.comment}</p>
           </div>
         )}
         {tpl && tpl.sections.map(sec => (
           <div key={sec.id} style={{ marginBottom: 12 }}>
-            {tpl.sections.length > 1 && <p className="label">{sec.name} <span style={{ fontWeight: 400, color: '#B5B0AB' }}>weight {sec.weight}</span></p>}
+            {tpl.sections.length > 1 && <p className="label">{sec.name} <span style={{ fontWeight: 400, color: 'var(--faint)' }}>weight {sec.weight}</span></p>}
             {sec.items.map(item => {
               const r = check.itemRatings[item.id];
               const rColor = r === 'pass' ? '#059669' : '#DC2626';
               const rBg = r === 'pass' ? '#DCFCE7' : '#FEE2E2';
               return (
-                <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid #F5F4F1' }}>
-                  <div style={{ width: 26, height: 26, borderRadius: 99, background: r ? rBg : '#F5F4F1', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {r ? <Icon name={r === 'pass' ? 'check' : 'x'} size={14} color={rColor} sw={2.5} /> : <span style={{ color: '#C8C4C0', fontSize: 12 }}>—</span>}
+                <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid var(--subtle)' }}>
+                  <div style={{ width: 26, height: 26, borderRadius: 99, background: r ? rBg : 'var(--subtle)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {r ? <Icon name={r === 'pass' ? 'check' : 'x'} size={14} color={rColor} sw={2.5} /> : <span style={{ color: 'var(--faint2)', fontSize: 12 }}>—</span>}
                   </div>
                   <span style={{ fontSize: 13, lineHeight: 1.5 }}>{item.text}</span>
                 </div>
@@ -571,18 +729,18 @@ function NewCheckScreen({ data, user, onSave, onBack }) {
 
   const StepHead = ({ title, sub }) => (
     <div style={{ marginBottom: 20 }}>
-      <div style={{ background: '#EDEDEB', borderRadius: 99, height: 3, marginBottom: 10, overflow: 'hidden' }}>
-        <div style={{ height: '100%', background: '#1C1917', borderRadius: 99, width: `${step / TOTAL * 100}%`, transition: 'width 0.3s ease' }} />
+      <div style={{ background: 'var(--border)', borderRadius: 99, height: 3, marginBottom: 10, overflow: 'hidden' }}>
+        <div style={{ height: '100%', background: 'var(--text)', borderRadius: 99, width: `${step / TOTAL * 100}%`, transition: 'width 0.3s ease' }} />
       </div>
-      <div style={{ fontSize: 11, color: '#A8A29E', marginBottom: 4 }}>Step {step} of {TOTAL}</div>
+      <div style={{ fontSize: 11, color: 'var(--label)', marginBottom: 4 }}>Step {step} of {TOTAL}</div>
       <h2 style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em' }}>{title}</h2>
-      {sub && <p style={{ fontSize: 13, color: '#78716C', marginTop: 3 }}>{sub}</p>}
+      {sub && <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 3 }}>{sub}</p>}
     </div>
   );
 
   return (
     <div className="screen fade-in">
-      <button onClick={step > 1 ? () => setStep(s => s - 1) : onBack} style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#78716C', marginBottom: 16, fontSize: 14 }}>
+      <button onClick={step > 1 ? () => setStep(s => s - 1) : onBack} style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--muted)', marginBottom: 16, fontSize: 14 }}>
         <Icon name="chevL" size={18} /> {step > 1 ? 'Back' : 'Cancel'}
       </button>
 
@@ -597,10 +755,10 @@ function NewCheckScreen({ data, user, onSave, onBack }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div><p className="label">Date</p><input type="date" className="soc-input" value={form.date} onChange={e => set('date', e.target.value)} /></div>
           <div><p className="label">Trainee / Employee Name</p><input className="soc-input" placeholder="Enter full name" value={form.traineeName} onChange={e => set('traineeName', e.target.value)} /></div>
-          <div style={{ padding: '11px 14px', borderRadius: 12, background: '#F9F8F6', border: '1.5px solid #EEEDEB', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ padding: '11px 14px', borderRadius: 12, background: 'var(--subtle2)', border: '1.5px solid var(--border)', display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 34, height: 34, borderRadius: 99, background: ROLE_COLOR[user.role] + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Icon name="user" size={16} color={ROLE_COLOR[user.role]} /></div>
-            <div><div style={{ fontSize: 11, color: '#A8A29E', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Conducted by</div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: '#1C1917' }}>{user.name} <span style={{ fontWeight: 400, color: '#78716C' }}>· {ROLES[user.role]}</span></div></div>
+            <div><div style={{ fontSize: 11, color: 'var(--label)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Conducted by</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)' }}>{user.name} <span style={{ fontWeight: 400, color: 'var(--muted)' }}>· {ROLES[user.role]}</span></div></div>
           </div>
         </div>
       </div>}
@@ -614,10 +772,10 @@ function NewCheckScreen({ data, user, onSave, onBack }) {
                 <div style={{ fontWeight: 500, fontSize: 14 }}>{t.name}</div>
                 <div style={{ fontSize: 12, opacity: 0.6, marginTop: 2 }}>{t.sections.reduce((n, s) => n + s.items.length, 0)} items</div>
               </div>
-              {form.templateId === t.id && <Icon name="check" size={18} color="#fff" sw={2.5} />}
+              {form.templateId === t.id && <Icon name="check" size={18} color="var(--text-inv)" sw={2.5} />}
             </button>
           ))}
-          {data.templates.length === 0 && <div style={{ padding: '24px 16px', textAlign: 'center', color: '#A8A29E', fontSize: 14 }}>No templates yet — ask your GM to upload some via the Library tab</div>}
+          {data.templates.length === 0 && <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--label)', fontSize: 14 }}>No templates yet — ask your GM to upload some via the Library tab</div>}
         </div>
       </div>}
 
@@ -625,15 +783,15 @@ function NewCheckScreen({ data, user, onSave, onBack }) {
         <StepHead title={currentTpl.name} sub={`Rating for ${form.traineeName}`} />
         {currentTpl.sections.map(sec => (
           <div key={sec.id} style={{ marginBottom: 14 }}>
-            {currentTpl.sections.length > 1 && <p className="label">{sec.name} <span style={{ fontWeight: 400, color: '#B5B0AB' }}>· weight {sec.weight}</span></p>}
+            {currentTpl.sections.length > 1 && <p className="label">{sec.name} <span style={{ fontWeight: 400, color: 'var(--faint)' }}>· weight {sec.weight}</span></p>}
             <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
               {sec.items.map((item, idx) => (
-                <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: idx < sec.items.length - 1 ? '1px solid #F5F4F1' : 'none' }}>
+                <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: idx < sec.items.length - 1 ? '1px solid var(--subtle)' : 'none' }}>
                   <p style={{ fontSize: 14, lineHeight: 1.45, flex: 1 }}>{item.text}</p>
                   <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                     {[{ r: 'pass', icon: 'check', active: '#059669', activeBg: '#DCFCE7' }, { r: 'fail', icon: 'x', active: '#DC2626', activeBg: '#FEE2E2' }].map(({ r, icon, active, activeBg }) => {
                       const on = form.itemRatings[item.id] === r;
-                      return <button key={r} onClick={() => set('itemRatings', { ...form.itemRatings, [item.id]: r })} style={{ width: 40, height: 40, borderRadius: 99, flexShrink: 0, border: `1.5px solid ${on ? active : '#E7E5E4'}`, background: on ? activeBg : '#F9F8F6', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.1s' }}><Icon name={icon} size={18} color={on ? active : '#C8C4C0'} sw={on ? 2.8 : 1.8} /></button>;
+                      return <button key={r} className="rate-btn" onClick={() => set('itemRatings', { ...form.itemRatings, [item.id]: r })} style={{ width: 40, height: 40, borderRadius: 99, flexShrink: 0, border: `1.5px solid ${on ? active : 'var(--input-border)'}`, background: on ? activeBg : 'var(--subtle2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icon name={icon} size={18} color={on ? active : 'var(--faint2)'} sw={on ? 2.8 : 1.8} /></button>;
                     })}
                   </div>
                 </div>
@@ -642,11 +800,11 @@ function NewCheckScreen({ data, user, onSave, onBack }) {
           </div>
         ))}
         <div style={{ marginTop: 20 }}>
-          <p className="label" style={{ marginBottom: 6 }}>Comments / Feedback <span style={{ fontWeight: 400, color: '#B5B0AB', textTransform: 'none', letterSpacing: 0 }}>— optional</span></p>
+          <p className="label" style={{ marginBottom: 6 }}>Comments / Feedback <span style={{ fontWeight: 400, color: 'var(--faint)', textTransform: 'none', letterSpacing: 0 }}>— optional</span></p>
           <textarea className="soc-input" rows={3} placeholder="Add any notes or observations..." value={form.comment} onChange={e => set('comment', e.target.value)} style={{ resize: 'vertical', lineHeight: 1.5 }} />
         </div>
         {allRated && <div style={{ padding: '14px 18px', borderRadius: 14, background: scoreStyle(score).bg, border: `1px solid ${scoreStyle(score).color}30`, marginTop: 12 }}>
-          <div style={{ fontSize: 12, color: '#78716C' }}>Current Score</div>
+          <div style={{ fontSize: 12, color: 'var(--muted)' }}>Current Score</div>
           <div style={{ fontSize: 32, fontWeight: 700, color: scoreStyle(score).color, letterSpacing: '-0.03em' }}>{score}%</div>
         </div>}
       </div>}
@@ -654,13 +812,13 @@ function NewCheckScreen({ data, user, onSave, onBack }) {
       {step === 5 && <div className="fade-in">
         <StepHead title="Review & Submit" sub="Check everything before submitting" />
         <div className="card" style={{ marginBottom: 12 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid #F5F4F1' }}>
-            <div><div style={{ fontWeight: 700, fontSize: 15 }}>{currentTpl?.name}</div><div style={{ fontSize: 13, color: '#78716C', marginTop: 2 }}>{form.outlet}</div></div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid var(--subtle)' }}>
+            <div><div style={{ fontWeight: 700, fontSize: 15 }}>{currentTpl?.name}</div><div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 2 }}>{form.outlet}</div></div>
             <div style={{ fontSize: 32, fontWeight: 700, color: scoreStyle(score).color, letterSpacing: '-0.03em', lineHeight: 1 }}>{score}%</div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {[['Trainee', form.traineeName], ['Date', fmtDate(form.date)], ['Trainer', user.name]].map(([l, v]) => (
-              <div key={l} style={{ background: '#F9F8F6', borderRadius: 10, padding: '10px 12px' }}><div style={{ fontSize: 11, color: '#78716C' }}>{l}</div><div style={{ fontSize: 13, fontWeight: 500, marginTop: 1 }}>{v}</div></div>
+              <div key={l} style={{ background: 'var(--subtle2)', borderRadius: 10, padding: '10px 12px' }}><div style={{ fontSize: 11, color: 'var(--muted)' }}>{l}</div><div style={{ fontSize: 13, fontWeight: 500, marginTop: 1 }}>{v}</div></div>
             ))}
           </div>
         </div>
@@ -677,19 +835,23 @@ function HistoryScreen({ data, onViewCheck }) {
   return (
     <div className="screen fade-in">
       <h2 style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 14 }}>Check History</h2>
-      <p style={{ fontSize: 13, color: '#78716C', marginBottom: 10 }}>{checks.length} check{checks.length !== 1 ? 's' : ''}</p>
+      <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 10 }}>{checks.length} check{checks.length !== 1 ? 's' : ''}</p>
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
         {checks.map((c, i) => (
-          <button key={c.id} onClick={() => onViewCheck(c)} style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '11px 16px', textAlign: 'left', background: 'transparent', borderBottom: i < checks.length - 1 ? '1px solid #F5F4F1' : 'none' }}>
+          <button key={c.id} onClick={() => onViewCheck(c)} style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '11px 16px', textAlign: 'left', background: 'transparent', borderBottom: i < checks.length - 1 ? '1px solid var(--subtle)' : 'none' }}>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 14, fontWeight: 500 }}>{c.traineeName}</div>
-              <div style={{ fontSize: 12, color: '#78716C', marginTop: 1 }}>{c.templateName} · {fmtDate(c.date)}</div>
-              <div style={{ fontSize: 11, color: '#A8A29E', marginTop: 1 }}>Trainer: {c.trainerName}</div>
+              <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 1 }}>{c.templateName} · {fmtDate(c.date)}</div>
+              <div style={{ fontSize: 11, color: 'var(--label)', marginTop: 1 }}>Trainer: {c.trainerName}</div>
             </div>
             <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>{c.hasFail && <Icon name="alert" size={14} color="#DC2626" />}<ScorePill score={c.score} /></div>
           </button>
         ))}
-        {checks.length === 0 && <div style={{ padding: '40px 16px', textAlign: 'center', color: '#A8A29E', fontSize: 14 }}>No checks yet</div>}
+        {checks.length === 0 && <div style={{ padding: '44px 16px', textAlign: 'center' }}>
+          <div style={{ width: 44, height: 44, borderRadius: 99, background: 'var(--subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 10px' }}><Icon name="list" size={20} color="var(--faint)" /></div>
+          <p style={{ color: 'var(--label)', fontSize: 14, fontWeight: 500 }}>No checks yet</p>
+          <p style={{ color: 'var(--faint)', fontSize: 12, marginTop: 3 }}>Completed checks will appear here</p>
+        </div>}
       </div>
     </div>
   );
@@ -724,18 +886,18 @@ function ReportsScreen({ data }) {
     <div className="screen fade-in">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
         <h2 style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em' }}>Reports</h2>
-        <button onClick={doExport} style={{ display: 'flex', gap: 6, alignItems: 'center', padding: '8px 14px', borderRadius: 10, background: '#F5F4F1', fontSize: 13, fontWeight: 500, border: '1px solid #EDEDEB' }}><Icon name="download" size={14} /> Export CSV</button>
+        <button onClick={doExport} style={{ display: 'flex', gap: 6, alignItems: 'center', padding: '8px 14px', borderRadius: 10, background: 'var(--subtle)', fontSize: 13, fontWeight: 500, border: '1px solid var(--border)' }}><Icon name="download" size={14} /> Export CSV</button>
       </div>
       <div className="tab-strip" style={{ marginBottom: 12 }}>{['week', 'month'].map(p => <button key={p} className={'tab-btn' + (period === p ? ' active' : '')} onClick={() => setPeriod(p)}>{p === 'week' ? 'This Week' : 'This Month'}</button>)}</div>
-      <p style={{ fontSize: 13, color: '#78716C', marginBottom: 12 }}>{filtered.length} checks · last {days} days</p>
+      <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 12 }}>{filtered.length} checks · last {days} days</p>
       <div className="tab-strip" style={{ marginBottom: 14 }}>{[['scores', 'Employee Scores'], ['activity', 'Trainers'], ['crew', 'Crew']].map(([id, label]) => <button key={id} className={'tab-btn' + (rTab === id ? ' active' : '')} onClick={() => setRTab(id)}>{label}</button>)}</div>
 
       {rTab === 'scores' && <div className="card" style={{ padding: 0, overflow: 'auto' }}>
         <table className="report-table">
           <thead><tr><th>Employee</th><th>Checks</th><th>Avg</th><th>Last Check</th></tr></thead>
           <tbody>
-            {empSummary.map(e => <tr key={e.name}><td style={{ fontWeight: 500 }}>{e.name}</td><td>{e.count}</td><td><ScorePill score={e.avg} /></td><td style={{ color: '#78716C', fontSize: 12 }}>{fmtDate(e.last)}</td></tr>)}
-            {empSummary.length === 0 && <tr><td colSpan={4} style={{ textAlign: 'center', color: '#A8A29E', padding: 32 }}>No data for this period</td></tr>}
+            {empSummary.map(e => <tr key={e.name}><td style={{ fontWeight: 500 }}>{e.name}</td><td>{e.count}</td><td><ScorePill score={e.avg} /></td><td style={{ color: 'var(--muted)', fontSize: 12 }}>{fmtDate(e.last)}</td></tr>)}
+            {empSummary.length === 0 && <tr><td colSpan={4} style={{ textAlign: 'center', color: 'var(--label)', padding: 32 }}>No data for this period</td></tr>}
           </tbody>
         </table>
       </div>}
@@ -744,8 +906,8 @@ function ReportsScreen({ data }) {
         <table className="report-table">
           <thead><tr><th>Trainer</th><th>Checks</th><th>Rate</th><th>Last Active</th></tr></thead>
           <tbody>
-            {trainerActivity.map(t => { const rate = Math.min(Math.round(t.count / days * 100), 100); return <tr key={t.name}><td style={{ fontWeight: 500 }}>{t.name}</td><td>{t.count}</td><td><ScorePill score={rate} /></td><td style={{ color: '#78716C', fontSize: 12 }}>{fmtDate(t.last)}</td></tr>; })}
-            {trainerActivity.length === 0 && <tr><td colSpan={4} style={{ textAlign: 'center', color: '#A8A29E', padding: 24 }}>No data</td></tr>}
+            {trainerActivity.map(t => { const rate = Math.min(Math.round(t.count / days * 100), 100); return <tr key={t.name}><td style={{ fontWeight: 500 }}>{t.name}</td><td>{t.count}</td><td><ScorePill score={rate} /></td><td style={{ color: 'var(--muted)', fontSize: 12 }}>{fmtDate(t.last)}</td></tr>; })}
+            {trainerActivity.length === 0 && <tr><td colSpan={4} style={{ textAlign: 'center', color: 'var(--label)', padding: 24 }}>No data</td></tr>}
           </tbody>
         </table>
       </div>}
@@ -756,12 +918,12 @@ function ReportsScreen({ data }) {
         const crewList = Object.entries(crewMap).map(([name, checks]) => ({ name, checks: checks.slice().sort((a, b) => b.date.localeCompare(a.date)), avg: Math.round(checks.reduce((s, c) => s + c.score, 0) / checks.length) })).sort((a, b) => a.name.localeCompare(b.name));
         return (
           <div className="fade-in">
-            {crewList.length === 0 && <div style={{ textAlign: 'center', padding: '40px 16px', color: '#A8A29E', fontSize: 14 }}>No checks in this period</div>}
+            {crewList.length === 0 && <div style={{ textAlign: 'center', padding: '40px 16px', color: 'var(--label)', fontSize: 14 }}>No checks in this period</div>}
             <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
               {crewList.map((c, i) => (
-                <button key={c.name} onClick={() => setSelectedCrew(c.name)} style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '12px 16px', textAlign: 'left', background: 'transparent', borderBottom: i < crewList.length - 1 ? '1px solid #F5F4F1' : 'none' }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 99, background: '#F5F4F1', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Icon name="user" size={17} color="#78716C" /></div>
-                  <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 600 }}>{c.name}</div><div style={{ fontSize: 12, color: '#78716C' }}>{c.checks.length} SOC{c.checks.length !== 1 ? 's' : ''} · Last {fmtDate(c.checks[0].date)}</div></div>
+                <button key={c.name} onClick={() => setSelectedCrew(c.name)} style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '12px 16px', textAlign: 'left', background: 'transparent', borderBottom: i < crewList.length - 1 ? '1px solid var(--subtle)' : 'none' }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 99, background: 'var(--subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Icon name="user" size={17} color="#78716C" /></div>
+                  <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 600 }}>{c.name}</div><div style={{ fontSize: 12, color: 'var(--muted)' }}>{c.checks.length} SOC{c.checks.length !== 1 ? 's' : ''} · Last {fmtDate(c.checks[0].date)}</div></div>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}><ScorePill score={c.avg} /><Icon name="chevR" size={16} color="#C8C4C0" /></div>
                 </button>
               ))}
@@ -770,23 +932,24 @@ function ReportsScreen({ data }) {
               const crew = crewList.find(c => c.name === selectedCrew); if (!crew) return null;
               return (
                 <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 100, display: 'flex', alignItems: 'flex-end' }} onClick={() => setSelectedCrew(null)}>
-                  <div onClick={e => e.stopPropagation()} style={{ background: '#F7F6F3', borderRadius: '20px 20px 0 0', width: '100%', maxWidth: 480, maxHeight: '88vh', overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ padding: '20px 20px 14px', background: '#fff', borderBottom: '1px solid #EEEDEB', borderRadius: '20px 20px 0 0', flexShrink: 0 }}>
+                  <div onClick={e => e.stopPropagation()} className="sheet-in" style={{ background: 'var(--bg)', borderRadius: '20px 20px 0 0', width: '100%', maxWidth: 480, maxHeight: '88vh', overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ padding: '20px 20px 14px', background: 'var(--surface)', borderBottom: '1px solid var(--border)', borderRadius: '20px 20px 0 0', flexShrink: 0 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div><h3 style={{ fontSize: 17, fontWeight: 700 }}>{crew.name}</h3><p style={{ fontSize: 13, color: '#78716C', marginTop: 2 }}>{crew.checks.length} SOC{crew.checks.length !== 1 ? 's' : ''} this period</p></div>
-                        <button onClick={() => setSelectedCrew(null)} style={{ color: '#78716C', padding: 4, background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" size={20} /></button>
+                        <div><h3 style={{ fontSize: 17, fontWeight: 700 }}>{crew.name}</h3><p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 2 }}>{crew.checks.length} SOC{crew.checks.length !== 1 ? 's' : ''} this period</p></div>
+                        <button onClick={() => setSelectedCrew(null)} style={{ color: 'var(--muted)', padding: 4, background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" size={20} /></button>
                       </div>
                     </div>
                     <div style={{ flex: 1, overflow: 'auto', padding: '12px 16px' }}>
+                      <CrewBars checks={crew.checks} />
                       {crew.checks.map(c => (
                         <div key={c.id} className="card" style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 12 }}>
-                          <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 500 }}>{c.templateName}</div><div style={{ fontSize: 12, color: '#78716C', marginTop: 2 }}>{fmtDate(c.date)} · {c.trainerName}</div>{c.comment && <div style={{ fontSize: 12, color: '#78716C', marginTop: 4, fontStyle: 'italic' }}>"{c.comment}"</div>}</div>
+                          <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 500 }}>{c.templateName}</div><div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{fmtDate(c.date)} · {c.trainerName}</div>{c.comment && <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4, fontStyle: 'italic' }}>"{c.comment}"</div>}</div>
                           <ScorePill score={c.score} />
                         </div>
                       ))}
                     </div>
-                    <div style={{ padding: '14px 16px 28px', background: '#fff', borderTop: '1px solid #EEEDEB', flexShrink: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: 13, color: '#78716C', fontWeight: 500 }}>Average Score</span><ScorePill score={crew.avg} />
+                    <div style={{ padding: '14px 16px 28px', background: 'var(--surface)', borderTop: '1px solid var(--border)', flexShrink: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 500 }}>Average Score</span><ScorePill score={crew.avg} />
                     </div>
                   </div>
                 </div>
@@ -853,37 +1016,37 @@ function TemplatesScreen({ data, currentUserId, onAddTemplates, onDeleteTemplate
           <button onClick={() => fileRef.current?.click()} disabled={saving} style={{ display: 'flex', gap: 6, alignItems: 'center', padding: '9px 14px', borderRadius: 10, background: 'linear-gradient(135deg,#1565C0,#6A1FC2)', color: '#fff', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer', opacity: saving ? 0.6 : 1 }}><Icon name="upload" size={14} color="#fff" /> {saving ? 'Reading…' : 'Upload Files'}</button>
           <input ref={fileRef} type="file" multiple accept=".docx,.xlsx,.xls,.csv,.txt,.doc" style={{ display: 'none' }} onChange={e => { handleFiles(e.target.files); e.target.value = ''; }} />
         </div>
-        <p style={{ fontSize: 12, color: '#A8A29E', marginBottom: 16 }}>Select multiple files at once — hold Cmd / Ctrl when picking</p>
+        <p style={{ fontSize: 12, color: 'var(--label)', marginBottom: 16 }}>Select multiple files at once — hold Cmd / Ctrl when picking</p>
         <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: 16 }}>
-          {data.templates.length === 0 && <div style={{ textAlign: 'center', padding: '48px 16px', color: '#A8A29E', fontSize: 14 }}>No templates yet — tap Upload Files to add yours</div>}
+          {data.templates.length === 0 && <div style={{ textAlign: 'center', padding: '48px 16px', color: 'var(--label)', fontSize: 14 }}>No templates yet — tap Upload Files to add yours</div>}
           {data.templates.map((t, i) => (
-            <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: i < data.templates.length - 1 ? '1px solid #F5F4F1' : 'none' }}>
-              <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 500 }}>{t.name}</div><div style={{ fontSize: 12, color: '#78716C', marginTop: 2 }}>{t.sections.reduce((n, s) => n + s.items.length, 0)} items</div></div>
-              <button onClick={async () => { if (!confirm('Remove this template?')) return; try { await onDeleteTemplate(t.id); } catch (e) { onToast(e.message); } }} style={{ padding: 6, color: '#A8A29E', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" size={16} /></button>
+            <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: i < data.templates.length - 1 ? '1px solid var(--subtle)' : 'none' }}>
+              <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 500 }}>{t.name}</div><div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{t.sections.reduce((n, s) => n + s.items.length, 0)} items</div></div>
+              <button onClick={async () => { if (!confirm('Remove this template?')) return; try { await onDeleteTemplate(t.id); } catch (e) { onToast(e.message); } }} style={{ padding: 6, color: 'var(--label)', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" size={16} /></button>
             </div>
           ))}
         </div>
 
         {showSheet && <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 100, display: 'flex', alignItems: 'flex-end' }} onClick={() => setShowSheet(false)}>
-          <div onClick={e => e.stopPropagation()} style={{ background: '#F7F6F3', borderRadius: '20px 20px 0 0', width: '100%', maxWidth: 480, maxHeight: '90vh', overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '20px 20px 12px', background: '#fff', borderBottom: '1px solid #EEEDEB', borderRadius: '20px 20px 0 0', flexShrink: 0 }}>
+          <div onClick={e => e.stopPropagation()} className="sheet-in" style={{ background: 'var(--bg)', borderRadius: '20px 20px 0 0', width: '100%', maxWidth: 480, maxHeight: '90vh', overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '20px 20px 12px', background: 'var(--surface)', borderBottom: '1px solid var(--border)', borderRadius: '20px 20px 0 0', flexShrink: 0 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div><h3 style={{ fontSize: 16, fontWeight: 700 }}>Review Uploads</h3><p style={{ fontSize: 12, color: '#78716C', marginTop: 2 }}>{batch.length} file{batch.length !== 1 ? 's' : ''} — assign a department to each</p></div>
-                <button onClick={() => setShowSheet(false)} style={{ color: '#78716C', padding: 4, background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" size={20} /></button>
+                <div><h3 style={{ fontSize: 16, fontWeight: 700 }}>Review Uploads</h3><p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{batch.length} file{batch.length !== 1 ? 's' : ''} — assign a department to each</p></div>
+                <button onClick={() => setShowSheet(false)} style={{ color: 'var(--muted)', padding: 4, background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" size={20} /></button>
               </div>
             </div>
             <div style={{ flex: 1, overflow: 'auto', padding: '14px 16px' }}>
               {batch.map((b, i) => (
                 <div key={i} className="card" style={{ marginBottom: 10, opacity: b.error ? 0.5 : 1 }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: b.error ? 0 : 10 }}>
-                    <div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: '#1C1917' }}>{b.name}</div>{b.error ? <div style={{ fontSize: 12, color: '#DC2626', marginTop: 2 }}>{b.error}</div> : <div style={{ fontSize: 12, color: '#78716C', marginTop: 2 }}>{b.items.length} items detected</div>}</div>
+                    <div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{b.name}</div>{b.error ? <div style={{ fontSize: 12, color: '#DC2626', marginTop: 2 }}>{b.error}</div> : <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{b.items.length} items detected</div>}</div>
                     {b.department && !b.error && <Icon name="check" size={16} color="#059669" sw={2.5} />}
                   </div>
                   {!b.error && <select className="soc-input soc-select" value={b.department} onChange={e => updateBatch(i, 'department', e.target.value)} style={{ fontSize: 13, padding: '9px 12px' }}><option value="">Assign department…</option>{DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}</select>}
                 </div>
               ))}
             </div>
-            <div style={{ padding: '12px 16px 32px', background: '#fff', borderTop: '1px solid #EEEDEB', flexShrink: 0 }}>
+            <div style={{ padding: '12px 16px 32px', background: 'var(--surface)', borderTop: '1px solid var(--border)', flexShrink: 0 }}>
               <button className="btn-primary" onClick={saveAll} disabled={readyCount === 0} style={{ opacity: readyCount > 0 ? 1 : 0.35 }}>Save {readyCount} Template{readyCount !== 1 ? 's' : ''} to Library</button>
             </div>
           </div>
@@ -903,10 +1066,10 @@ function TemplatesScreen({ data, currentUserId, onAddTemplates, onDeleteTemplate
               <p className="label">{ROLES[role]}s</p>
               <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
                 {members.map((u, i) => (
-                  <div key={u.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: i < members.length - 1 ? '1px solid #F5F4F1' : 'none' }}>
+                  <div key={u.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: i < members.length - 1 ? '1px solid var(--subtle)' : 'none' }}>
                     <div style={{ width: 36, height: 36, borderRadius: 99, background: ROLE_COLOR[u.role] + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Icon name="user" size={16} color={ROLE_COLOR[u.role]} /></div>
-                    <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 500 }}>{u.name}</div><div style={{ fontSize: 12, color: '#78716C' }}>{ROLES[u.role]}</div></div>
-                    {u.id !== currentUserId && <button onClick={async () => { if (!confirm('Remove ' + u.name + '?')) return; try { await onRemoveUser(u.id); } catch (e) { onToast(e.message); } }} style={{ padding: 6, color: '#A8A29E', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" size={16} /></button>}
+                    <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 500 }}>{u.name}</div><div style={{ fontSize: 12, color: 'var(--muted)' }}>{ROLES[u.role]}</div></div>
+                    {u.id !== currentUserId && <button onClick={async () => { if (!confirm('Remove ' + u.name + '?')) return; try { await onRemoveUser(u.id); } catch (e) { onToast(e.message); } }} style={{ padding: 6, color: 'var(--label)', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" size={16} /></button>}
                   </div>
                 ))}
               </div>
@@ -914,8 +1077,8 @@ function TemplatesScreen({ data, currentUserId, onAddTemplates, onDeleteTemplate
           );
         })}
         {showAddUser && <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 100, display: 'flex', alignItems: 'flex-end' }} onClick={() => setShowAddUser(false)}>
-          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: '20px 20px 0 0', width: '100%', maxWidth: 480, padding: '22px 20px 36px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}><h3 style={{ fontSize: 16, fontWeight: 700 }}>Add Team Member</h3><button onClick={() => setShowAddUser(false)} style={{ color: '#78716C', padding: 4, background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" size={20} /></button></div>
+          <div onClick={e => e.stopPropagation()} className="sheet-in" style={{ background: 'var(--surface)', borderRadius: '20px 20px 0 0', width: '100%', maxWidth: 480, padding: '22px 20px 36px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}><h3 style={{ fontSize: 16, fontWeight: 700 }}>Add Team Member</h3><button onClick={() => setShowAddUser(false)} style={{ color: 'var(--muted)', padding: 4, background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" size={20} /></button></div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div><p className="label">Full Name</p><input className="soc-input" placeholder="e.g. Sarah M." value={newUser.name} onChange={e => setNewUser(u => ({ ...u, name: e.target.value }))} /></div>
               <div><p className="label">Role</p><select className="soc-input soc-select" value={newUser.role} onChange={e => setNewUser(u => ({ ...u, role: e.target.value }))}><option value="teamleader">Team Leader</option><option value="trainer">Crew Trainer</option><option value="manager">Manager</option><option value="admin">GM / Dept. Manager</option></select></div>
@@ -973,14 +1136,18 @@ function App() {
   async function afterAuth() { const u = await SocDB.currentUser(); const d = await SocDB.loadData(); setUser(u); setData(d); setTab('dashboard'); setPhase('app'); }
   async function reload() { try { setData(await SocDB.loadData()); } catch (e) { setToast(e.message); } }
   async function logout() { await SocDB.signOut(); setUser(null); setData(null); setPhase('login'); }
-  async function saveCheck(check) { await SocDB.insertCheck(check); await reload(); setSubmitted(check); setTab('dashboard'); }
+  async function saveCheck(check) {
+    try { await SocDB.insertCheck(check); }
+    catch (e) { setToast('Could not submit — check your connection and try again.'); throw e; }
+    await reload(); setSubmitted(check); setTab('dashboard');
+  }
 
   const addTemplates = async tpls => { await SocDB.addTemplates(tpls); await reload(); };
   const deleteTemplate = async id => { await SocDB.deleteTemplate(id); await reload(); };
   const addUser = async u => { await SocDB.addUser(u); await reload(); };
   const removeUser = async id => { await SocDB.removeUser(id); await reload(); };
 
-  if (phase === 'boot') return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: '#78716C' }}>Loading…</div>;
+  if (phase === 'boot') return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}><div className="spinner" /></div>;
   if (phase === 'setup') return <div className="app-shell"><div style={{ flex: 1, overflowY: 'auto' }}><SetupScreen /></div></div>;
   if (phase === 'login') return <div className="app-shell"><div style={{ flex: 1, overflowY: 'auto' }}><LoginScreen onAuthed={afterAuth} /></div></div>;
 
@@ -988,9 +1155,9 @@ function App() {
     <div className="app-shell">
       {submitted && <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }} onClick={() => setSubmitted(null)}>
         <div onClick={e => e.stopPropagation()} className="card fade-in" style={{ width: '100%', maxWidth: 340, textAlign: 'center', padding: 28 }}>
-          <div style={{ width: 60, height: 60, borderRadius: 99, background: scoreStyle(submitted.score).bg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}><Icon name="check" size={30} color={scoreStyle(submitted.score).color} sw={2.5} /></div>
+          <div className="pop-in" style={{ width: 60, height: 60, borderRadius: 99, background: scoreStyle(submitted.score).bg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}><Icon name="check" size={30} color={scoreStyle(submitted.score).color} sw={2.5} /></div>
           <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>Check Submitted</h3>
-          <p style={{ fontSize: 13, color: '#78716C', marginBottom: 14 }}>{submitted.traineeName}</p>
+          <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 14 }}>{submitted.traineeName}</p>
           <div style={{ fontSize: 48, fontWeight: 700, color: scoreStyle(submitted.score).color, letterSpacing: '-0.04em', marginBottom: 6 }}>{submitted.score}%</div>
           <button className="btn-primary" onClick={() => setSubmitted(null)}>Done</button>
         </div>

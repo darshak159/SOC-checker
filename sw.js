@@ -1,7 +1,7 @@
 // SOC Checker service worker — installable + instant load.
 // Caches static assets only (app shell + CDN libs). NEVER caches Supabase API
 // or auth calls, so live data always comes from the network.
-const CACHE = 'soc-checker-v1';
+const CACHE = 'soc-checker-v2';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png'];
 
 self.addEventListener('install', (e) => {
